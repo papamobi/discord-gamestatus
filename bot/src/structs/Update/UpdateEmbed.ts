@@ -32,6 +32,8 @@ function serverFormat(str: string, server: State) {
   return str;
 }
 
+const stripQ3Colors = (s: string) => s.replace(/\^[0-9]/g, "");
+
 const OPT_TITLE: (keyof UpdateOptions)[] = ["title", "offlineTitle"];
 const OPT_DESCRIPTION: (keyof UpdateOptions)[] = [
   "description",
@@ -68,14 +70,50 @@ export async function generateEmbed(
   const image = update.getOption(OPT_IMAGE[isOffline]) as string;
   if (image.length > 0) embed.setThumbnail(image);
 
+  // Sort players by score descending (highest score at top)
+  const sorted = [...players].sort((a, b) => {
+    const sa = Number((a.raw as Record<string, unknown>)?.score ?? 0);
+    const sb = Number((b.raw as Record<string, unknown>)?.score ?? 0);
+    return sb - sa;
+  });
+
   const columns = update.getOption("columns") as number;
-  const rows = Math.ceil(players.length / columns);
+  const rows = Math.ceil(sorted.length / columns);
+
+  // Auto-scale name length budget based on how many columns the embed splits into.
+  // 1 column = wide rows, room for long names. 3 columns = narrow, must truncate.
+  const nameLimit = columns <= 1 ? 30 : columns === 2 ? 20 : 14;
+
+  // Detect if any player in this update actually has a score field;
+  // if not, use a simpler "Player" header.
+  const anyScore = sorted.some((p) => {
+    const r = (p.raw as Record<string, unknown>) ?? {};
+    return r.score !== undefined && r.score !== null;
+  });
+  const fieldTitle = anyScore ? "`SCR` · Player" : "Player";
 
   for (let i = 0; i < columns; i++) {
-    const column = players.splice(0, rows);
+    const column = sorted.splice(0, rows);
     if (column.length > 0) {
-      const columnText = column.map((v: Player) => v.name).join("\n");
-      embed.addField("_ _", columnText, true);
+      // Determine widest score in this column for tight padding
+      const widestScore = column.reduce((max, p) => {
+        const r = (p.raw as Record<string, unknown>) ?? {};
+        if (r.score === undefined || r.score === null) return max;
+        return Math.max(max, String(r.score).length);
+      }, 1);
+
+      const lines = column.map((p) => {
+        const r = (p.raw as Record<string, unknown>) ?? {};
+        const hasScore = r.score !== undefined && r.score !== null;
+        const score = hasScore
+          ? String(r.score).padStart(widestScore, " ")
+          : "";
+        const name = stripQ3Colors(p.name ?? "");
+        const trimmed =
+          name.length > nameLimit ? name.slice(0, nameLimit - 1) + "…" : name;
+        return hasScore ? `\`${score}\` · ${trimmed}` : trimmed;
+      });
+      embed.addField(fieldTitle, lines.join("\n"), true);
     }
   }
 
