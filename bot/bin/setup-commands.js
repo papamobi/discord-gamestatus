@@ -1,65 +1,40 @@
 #!/usr/bin/env node
-
 "use strict";
-
-/*
-discord-gamestatus: Game server monitoring via discord API
-Copyright (C) 2022 Douile
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-*/
-
 const fs = require("fs/promises");
 const path = require("path");
-const { ApplicationCommandManager } = require("discord.js");
-const { REST } = require("@discordjs/rest");
-const { Routes } = require("discord-api-types/v10");
+const { Client, Intents } = require("discord.js");
 
 async function parseCommands() {
   const DIR = path.join(__dirname, "../dist/commands");
-  const commands = (await fs.readdir(DIR))
+  return (await fs.readdir(DIR))
     .map((file) => {
       const command = require(path.join(DIR, file));
       if (command.disableSlash) return undefined;
-      const newLineIndex = command.help.indexOf("\n");
-      return ApplicationCommandManager.transformCommand({
+      const nl = command.help.indexOf("\n");
+      return {
         name: command.name,
         description: command.help.substring(
           0,
-          Math.min(newLineIndex > 1 ? newLineIndex : command.help.length, 100)
+          Math.min(nl > 1 ? nl : command.help.length, 100)
         ),
         options: command.options,
-        defaultPermission: true,
         type: "CHAT_INPUT",
-      });
+      };
     })
-    .filter((command) => command !== undefined);
-  return commands;
+    .filter((c) => c !== undefined);
 }
 
-(async function () {
-  if (process.env.DISCORD_API_KEY) {
-    const rest = new REST({ version: 10 }).setToken(
-      process.env.DISCORD_API_KEY
-    );
-    const application = await rest.get(Routes.oauth2CurrentApplication());
-    const commands = await parseCommands();
-    await rest.put(Routes.applicationCommands(application.id), {
-      body: commands,
-    });
-  } else {
-    console.error(
-      "Running in dry mode, to actually modify your bot provide DISCORD_API_KEY environment variable"
-    );
-    const commands = await parseCommands();
-    console.log(JSON.stringify(commands, "  ", 2));
+(async () => {
+  if (!process.env.DISCORD_API_KEY) {
+    console.error("Set DISCORD_API_KEY");
+    process.exit(1);
   }
-})().then(null, console.error);
+  const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
+  await client.login(process.env.DISCORD_API_KEY);
+  const commands = await parseCommands();
+  console.log("Registering " + commands.length + " commands...");
+  const result = await client.application.commands.set(commands);
+  console.log("Registered " + result.size + " commands: " +
+    [...result.values()].map(c => c.name).join(", "));
+  client.destroy();
+})().catch((e) => { console.error(e); process.exit(1); });

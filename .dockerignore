@@ -17,3 +17,4 @@
 !scheduler/Cargo.toml
 !scheduler/.cargo/config.toml
 !scheduler/src/*.rs
+!bot/bin/setup-commands.js
