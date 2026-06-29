@@ -39,6 +39,32 @@ const stripQ3Colors = (s: string) => s.replace(/\^[0-9]/g, "");
 // code spans so Discord's mobile renderer doesn't trim them.
 const FIGURE_SPACE = "\u2007";
 
+// Extract score and clean name from a gamedig player object.
+// Quake Live's quake3 protocol returns score in raw.score and a clean name.
+// OpenArena's protocol drops the score and embeds it in the name field as
+// "<score> <time> <actual name>", with a duplicate in raw.frags.
+function extractScoreAndName(p: Player): { score: number | null; name: string } {
+  const r = (p.raw as Record<string, unknown>) ?? {};
+  let score: number | null = null;
+  let name = p.name ?? "";
+
+  // Prefer explicit score fields from gamedig
+  if (r.score !== undefined && r.score !== null) {
+    score = Number(r.score);
+  } else if (r.frags !== undefined && r.frags !== null) {
+    score = Number(r.frags);
+  }
+
+  // OpenArena name prefix: "<int> <float> <real name>"
+  const oaMatch = name.match(/^(-?\d+)\s+\d+(?:\.\d+)?\s+(.+)$/);
+  if (oaMatch) {
+    if (score === null) score = Number(oaMatch[1]);
+    name = oaMatch[2];
+  }
+
+  return { score, name };
+}
+
 const OPT_TITLE: (keyof UpdateOptions)[] = ["title", "offlineTitle"];
 const OPT_DESCRIPTION: (keyof UpdateOptions)[] = [
   "description",
@@ -75,58 +101,53 @@ export async function generateEmbed(
   const image = update.getOption(OPT_IMAGE[isOffline]) as string;
   if (image.length > 0) embed.setThumbnail(image);
 
-  // Sort players by score descending (highest score at top)
-  const sorted = [...players].sort((a, b) => {
-    const sa = Number((a.raw as Record<string, unknown>)?.score ?? 0);
-    const sb = Number((b.raw as Record<string, unknown>)?.score ?? 0);
+  // Pre-extract score and name for every player so sorting and rendering
+  // use the same values (and we only run the regex once per player).
+  const enriched = players.map((p) => ({
+    player: p,
+    ...extractScoreAndName(p),
+  }));
+
+  // Sort by score descending; players with no score sink to the bottom.
+  enriched.sort((a, b) => {
+    const sa = a.score ?? -Infinity;
+    const sb = b.score ?? -Infinity;
     return sb - sa;
   });
 
   const columns = update.getOption("columns") as number;
-  const rows = Math.ceil(sorted.length / columns);
+  const rows = Math.ceil(enriched.length / columns);
 
   // Auto-scale name length budget based on how many columns the embed splits into.
   const nameLimit = columns <= 1 ? 30 : columns === 2 ? 20 : 14;
 
-  // Detect if any player in this update actually has a score field;
-  // if not, use a simpler "Player" header.
-  const anyScore = sorted.some((p) => {
-    const r = (p.raw as Record<string, unknown>) ?? {};
-    return r.score !== undefined && r.score !== null;
-  });
+  // Detect if any player actually has a score; if not, simpler header.
+  const anyScore = enriched.some((e) => e.score !== null);
 
-  // Auto-width the score column based on the widest score across ALL columns,
-  // so they align consistently when stacked on mobile.
-  const widestScore = sorted.reduce((max, p) => {
-    const r = (p.raw as Record<string, unknown>) ?? {};
-    if (r.score === undefined || r.score === null) return max;
-    return Math.max(max, String(r.score).length);
+  // Auto-width the score column across ALL columns so they align on mobile.
+  const widestScore = enriched.reduce((max, e) => {
+    if (e.score === null) return max;
+    return Math.max(max, String(e.score).length);
   }, 1);
 
-  // Header lives as a bold first line inside column 1's content (field titles
-  // don't honor markdown reliably and repeat on mobile). Other columns get an
-  // invisible field title so they line up with column 1.
+  // Header lives as a bold first line inside column 1's content.
   const headerLine = anyScore ? "**`SCR` · Player**\n" : "**Player**\n";
   const invisibleTitle = "\u200B";
 
   for (let i = 0; i < columns; i++) {
-    const column = sorted.splice(0, rows);
+    const column = enriched.splice(0, rows);
     if (column.length > 0) {
-      const lines = column.map((p) => {
-        const r = (p.raw as Record<string, unknown>) ?? {};
-        const hasScore = r.score !== undefined && r.score !== null;
-        // Pad with FIGURE_SPACE (digit-width, non-whitespace) so Discord mobile
-        // doesn't trim leading spaces inside the inline code span.
+      const lines = column.map((e) => {
+        const hasScore = e.score !== null;
         const score = hasScore
-          ? String(r.score).padStart(widestScore, FIGURE_SPACE)
+          ? String(e.score).padStart(widestScore, FIGURE_SPACE)
           : "";
-        const name = stripQ3Colors(p.name ?? "");
+        const name = stripQ3Colors(e.name);
         const trimmed =
           name.length > nameLimit ? name.slice(0, nameLimit - 1) + "…" : name;
         return hasScore ? `\`${score}\` · ${trimmed}` : trimmed;
       });
 
-      // Header only on column 1; columns 2/3 just show their data.
       const content = (i === 0 ? headerLine : "") + lines.join("\n");
       embed.addField(invisibleTitle, content, true);
     }
