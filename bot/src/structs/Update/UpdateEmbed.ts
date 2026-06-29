@@ -34,6 +34,11 @@ function serverFormat(str: string, server: State) {
 
 const stripQ3Colors = (s: string) => s.replace(/\^[0-9]/g, "");
 
+// Figure space — a non-whitespace Unicode character that renders at the width
+// of a digit in monospace fonts. Used instead of regular spaces inside inline
+// code spans so Discord's mobile renderer doesn't trim them.
+const FIGURE_SPACE = "\u2007";
+
 const OPT_TITLE: (keyof UpdateOptions)[] = ["title", "offlineTitle"];
 const OPT_DESCRIPTION: (keyof UpdateOptions)[] = [
   "description",
@@ -90,29 +95,30 @@ export async function generateEmbed(
     return r.score !== undefined && r.score !== null;
   });
 
-  // Build the header line. Embed field titles don't honor Discord's small-text (-#)
-  // markdown, but field *content* does — so we put the header as the first line of
-  // column 1's content with the small-text prefix, and use an invisible title on
-  // every column. Result: one small header at the top on both desktop and mobile,
-  // no gaps between columns when stacked on mobile.
+  // Auto-width the score column based on the widest score across ALL columns,
+  // so they align consistently when stacked on mobile.
+  const widestScore = sorted.reduce((max, p) => {
+    const r = (p.raw as Record<string, unknown>) ?? {};
+    if (r.score === undefined || r.score === null) return max;
+    return Math.max(max, String(r.score).length);
+  }, 1);
+
+  // Header lives as a bold first line inside column 1's content (field titles
+  // don't honor markdown reliably and repeat on mobile). Other columns get an
+  // invisible field title so they line up with column 1.
   const headerLine = anyScore ? "**`SCR` · Player**\n" : "**Player**\n";
   const invisibleTitle = "\u200B";
 
   for (let i = 0; i < columns; i++) {
     const column = sorted.splice(0, rows);
     if (column.length > 0) {
-      // Determine widest score in this column for tight padding
-      const widestScore = column.reduce((max, p) => {
-        const r = (p.raw as Record<string, unknown>) ?? {};
-        if (r.score === undefined || r.score === null) return max;
-        return Math.max(max, String(r.score).length);
-      }, 1);
-
       const lines = column.map((p) => {
         const r = (p.raw as Record<string, unknown>) ?? {};
         const hasScore = r.score !== undefined && r.score !== null;
+        // Pad with FIGURE_SPACE (digit-width, non-whitespace) so Discord mobile
+        // doesn't trim leading spaces inside the inline code span.
         const score = hasScore
-          ? String(r.score).padStart(widestScore, " ")
+          ? String(r.score).padStart(widestScore, FIGURE_SPACE)
           : "";
         const name = stripQ3Colors(p.name ?? "");
         const trimmed =
