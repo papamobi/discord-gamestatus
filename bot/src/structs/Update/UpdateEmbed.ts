@@ -81,7 +81,6 @@ export async function generateEmbed(
   const rows = Math.ceil(sorted.length / columns);
 
   // Auto-scale name length budget based on how many columns the embed splits into.
-  // 1 column = wide rows, room for long names. 3 columns = narrow, must truncate.
   const nameLimit = columns <= 1 ? 30 : columns === 2 ? 20 : 14;
 
   // Detect if any player in this update actually has a score field;
@@ -90,7 +89,14 @@ export async function generateEmbed(
     const r = (p.raw as Record<string, unknown>) ?? {};
     return r.score !== undefined && r.score !== null;
   });
-  const fieldTitle = anyScore ? "`SCR` · Player" : "Player";
+
+  // Build the header line. Embed field titles don't honor Discord's small-text (-#)
+  // markdown, but field *content* does — so we put the header as the first line of
+  // column 1's content with the small-text prefix, and use an invisible title on
+  // every column. Result: one small header at the top on both desktop and mobile,
+  // no gaps between columns when stacked on mobile.
+  const headerLine = anyScore ? "**`SCR` · Player**\n" : "**Player**\n";
+  const invisibleTitle = "\u200B";
 
   for (let i = 0; i < columns; i++) {
     const column = sorted.splice(0, rows);
@@ -113,7 +119,10 @@ export async function generateEmbed(
           name.length > nameLimit ? name.slice(0, nameLimit - 1) + "…" : name;
         return hasScore ? `\`${score}\` · ${trimmed}` : trimmed;
       });
-      embed.addField(fieldTitle, lines.join("\n"), true);
+
+      // Header only on column 1; columns 2/3 just show their data.
+      const content = (i === 0 ? headerLine : "") + lines.join("\n");
+      embed.addField(invisibleTitle, content, true);
     }
   }
 
