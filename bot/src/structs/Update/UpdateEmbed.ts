@@ -40,26 +40,30 @@ const stripQ3Colors = (s: string) => s.replace(/\^[0-9]/g, "");
 const FIGURE_SPACE = "\u2007";
 
 // Extract score and clean name from a gamedig player object.
-// Quake Live's quake3 protocol returns score in raw.score and a clean name.
-// OpenArena's protocol drops the score and embeds it in the name field as
-// "<score> <time> <actual name>", with a duplicate in raw.frags.
+//
+// - Quake Live's quake3 protocol returns score in raw.score and a clean name.
+// - OpenArena's protocol drops the score and instead packs personal score
+//   into raw.frags as (score * 10 + extra_digit), and embeds a prefix in the
+//   name field as "<captures_or_kills> <time> <real name>".
+//   We detect OA by the presence of raw.frags (QL doesn't have it), strip the
+//   name prefix, and recover the personal score with Math.floor(frags / 10).
 function extractScoreAndName(p: Player): { score: number | null; name: string } {
   const r = (p.raw as Record<string, unknown>) ?? {};
   let score: number | null = null;
   let name = p.name ?? "";
 
-  // Prefer explicit score fields from gamedig
-  if (r.score !== undefined && r.score !== null) {
-    score = Number(r.score);
-  } else if (r.frags !== undefined && r.frags !== null) {
-    score = Number(r.frags);
-  }
+  const isOpenArena = r.frags !== undefined && r.frags !== null;
 
-  // OpenArena name prefix: "<int> <float> <real name>"
-  const oaMatch = name.match(/^(-?\d+)\s+\d+(?:\.\d+)?\s+(.+)$/);
-  if (oaMatch) {
-    if (score === null) score = Number(oaMatch[1]);
-    name = oaMatch[2];
+  if (isOpenArena) {
+    // Strip OA's "<int> <float> " name prefix
+    const oaMatch = name.match(/^-?\d+\s+\d+(?:\.\d+)?\s+(.+)$/);
+    if (oaMatch) name = oaMatch[1];
+
+    // Recover personal score from packed frags field
+    score = Math.floor(Number(r.frags) / 10);
+  } else if (r.score !== undefined && r.score !== null) {
+    // QL and other quake3-family protocols with clean score field
+    score = Number(r.score);
   }
 
   return { score, name };
@@ -101,8 +105,7 @@ export async function generateEmbed(
   const image = update.getOption(OPT_IMAGE[isOffline]) as string;
   if (image.length > 0) embed.setThumbnail(image);
 
-  // Pre-extract score and name for every player so sorting and rendering
-  // use the same values (and we only run the regex once per player).
+  // Pre-extract score and clean name once per player
   const enriched = players.map((p) => ({
     player: p,
     ...extractScoreAndName(p),
@@ -118,7 +121,7 @@ export async function generateEmbed(
   const columns = update.getOption("columns") as number;
   const rows = Math.ceil(enriched.length / columns);
 
-  // Auto-scale name length budget based on how many columns the embed splits into.
+  // Auto-scale name length budget based on column count
   const nameLimit = columns <= 1 ? 30 : columns === 2 ? 20 : 14;
 
   // Detect if any player actually has a score; if not, simpler header.
