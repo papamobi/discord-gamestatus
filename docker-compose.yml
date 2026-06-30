@@ -38,10 +38,10 @@ services:
     restart: on-failure
     command: [ "--debug", "--verbose" ]
   scheduler:
-    image: "gamestatus/gamestatus-scheduler"
-    #build:
-    #  context: "."
-    #  dockerfile: "./docker/Dockerfile.scheduler"
+    #image: "gamestatus/gamestatus-scheduler"
+    build:
+      context: "."
+      dockerfile: "./docker/Dockerfile.scheduler"
     depends_on:
       - "postgres"
     environment:
