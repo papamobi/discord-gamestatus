@@ -34,8 +34,10 @@ services:
       GS_SUPPORT_LINK: "${GS_SUPPORT_LINK}"
       GS_SCHEDULER_ADDR: "scheduler:1337"
       GS_QUERY_TIMEOUT: "${GS_QUERY_TIMEOUT}"
-      TR1CKHOUSE_ROSTER_API_URL: "http://172.18.0.1:8765/rosters"
+      TR1CKHOUSE_ROSTER_API_URL: "https://tr1ckhouse.net/rosters"
       TR1CKHOUSE_ROSTER_API_KEY: "${TR1CKHOUSE_ROSTER_API_KEY}"
+      TR1CKHOUSE_EMOJI_RED: "${TR1CKHOUSE_EMOJI_RED:-🟥}"
+      TR1CKHOUSE_EMOJI_BLUE: "${TR1CKHOUSE_EMOJI_BLUE:-🟦}"
     env_file: .env
     restart: on-failure
     command: [ "--debug", "--verbose" ]

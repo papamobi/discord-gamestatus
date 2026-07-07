@@ -1,7 +1,7 @@
 /*
 tr1ckhouse roster API client — fetches enriched per-server data from the
-per-VPS aggregator API, caches responses briefly, and matches statuses to
-their roster snapshot by "ip:port".
+central tr1ckhouse registry (https://tr1ckhouse.net/rosters) and matches
+statuses to their roster snapshot by "ip:port".
 
 Falls back gracefully when the API is unreachable, misconfigured, or the
 server isn't part of the tr1ckhouse fleet.
@@ -36,25 +36,21 @@ export interface Tr1ckhouseRoster {
   updated: number;
 }
 
-interface AggregatorResponse {
-  public_ip: string;
+interface RegistryResponse {
   generated_at: number;
+  count: number;
   rosters: Record<string, Tr1ckhouseRoster>;
 }
 
 const API_URL = process.env.TR1CKHOUSE_ROSTER_API_URL;
 const API_KEY = process.env.TR1CKHOUSE_ROSTER_API_KEY;
-const TIMEOUT_MS = Number(process.env.TR1CKHOUSE_ROSTER_TIMEOUT_MS ?? 1500);
+const TIMEOUT_MS = Number(process.env.TR1CKHOUSE_ROSTER_TIMEOUT_MS ?? 2000);
 const CACHE_MS = Number(process.env.TR1CKHOUSE_ROSTER_CACHE_MS ?? 30_000);
 
-let cache: {
-  fetchedAt: number;
-  data: AggregatorResponse;
-} | null = null;
+let cache: { fetchedAt: number; data: RegistryResponse } | null = null;
+let inflight: Promise<RegistryResponse | null> | null = null;
 
-let inflight: Promise<AggregatorResponse | null> | null = null;
-
-let lastWarn: number = 0;
+let lastWarn = 0;
 const WARN_THROTTLE_MS = 60_000;
 
 function warnThrottled(msg: string): void {
@@ -65,7 +61,7 @@ function warnThrottled(msg: string): void {
   }
 }
 
-async function fetchAggregator(): Promise<AggregatorResponse | null> {
+async function fetchRegistry(): Promise<RegistryResponse | null> {
   if (!API_URL || !API_KEY) return null;
 
   const controller = new AbortController();
@@ -77,20 +73,20 @@ async function fetchAggregator(): Promise<AggregatorResponse | null> {
       signal: controller.signal,
     });
     if (!res.ok) {
-      warnThrottled(`aggregator returned ${res.status}`);
+      warnThrottled(`registry returned ${res.status}`);
       return null;
     }
-    return (await res.json()) as AggregatorResponse;
+    return (await res.json()) as RegistryResponse;
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
-    warnThrottled(`aggregator fetch failed: ${msg}`);
+    warnThrottled(`registry fetch failed: ${msg}`);
     return null;
   } finally {
     clearTimeout(timer);
   }
 }
 
-async function getAggregatorPayload(): Promise<AggregatorResponse | null> {
+async function getRegistryPayload(): Promise<RegistryResponse | null> {
   if (!API_URL || !API_KEY) return null;
 
   const now = Date.now();
@@ -98,15 +94,11 @@ async function getAggregatorPayload(): Promise<AggregatorResponse | null> {
     return cache.data;
   }
 
-  // Coalesce concurrent fetches: many statuses ticking at once should share
-  // a single HTTP round-trip.
   if (inflight) return inflight;
 
   inflight = (async () => {
-    const data = await fetchAggregator();
-    if (data) {
-      cache = { fetchedAt: Date.now(), data };
-    }
+    const data = await fetchRegistry();
+    if (data) cache = { fetchedAt: Date.now(), data };
     return data;
   })();
 
@@ -119,12 +111,12 @@ async function getAggregatorPayload(): Promise<AggregatorResponse | null> {
 
 /**
  * Look up a tr1ckhouse roster by server ip:port. Returns null if the server
- * is not part of the tr1ckhouse fleet, or the API is unavailable.
+ * is not part of the tr1ckhouse fleet, or the registry is unavailable.
  */
 export async function getRoster(
   ipPort: string
 ): Promise<Tr1ckhouseRoster | null> {
-  const payload = await getAggregatorPayload();
+  const payload = await getRegistryPayload();
   if (!payload) return null;
   return payload.rosters[ipPort] ?? null;
 }

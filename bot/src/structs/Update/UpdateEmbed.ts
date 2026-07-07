@@ -39,6 +39,8 @@ function serverFormat(str: string, server: State) {
 
 const stripQ3Colors = (s: string) => s.replace(/\^[0-9]/g, "");
 const FIGURE_SPACE = "\u2007";
+const EMOJI_RED = process.env.TR1CKHOUSE_EMOJI_RED || "🟥";
+const EMOJI_BLUE = process.env.TR1CKHOUSE_EMOJI_BLUE || "🟦";
 
 function extractScoreAndName(p: Player): { score: number | null; name: string } {
   const r = (p.raw as Record<string, unknown>) ?? {};
@@ -199,12 +201,12 @@ function renderTr1ckhouseRoster(
     const widths = computeColumnWidths([...red, ...blue], layout);
 
     embed.addField(
-      `🟥 RED — ${roster.score_red}`,
+      `${EMOJI_RED} RED — ${roster.score_red}`,
       formatTeam(red, layout, widths),
       true
     );
     embed.addField(
-      `🟦 BLUE — ${roster.score_blue}`,
+      `${EMOJI_BLUE} BLUE — ${roster.score_blue}`,
       formatTeam(blue, layout, widths),
       true
     );
