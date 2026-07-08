@@ -29,6 +29,19 @@ differs from upstream in the following ways:
 - **Updated base images**: `node:22-alpine` (upstream was `node:18-alpine`,
   EOL April 2025) and `rust:1-alpine` for the scheduler
 
+### Env vars added by this fork
+
+- `CONNECT_REDIRECT_URL` — optional HTTPS URL for the {connect} embed placeholder on Steam/Valve-protocol servers.
+  Discord no longer renders steam:// schemes as clickable
+  in embeds, so those links have been effectively dead. Set
+  this to a page that accepts `?ip=<ip>&port=<port>` and emits a
+  `steam://connect/...` launch, and `{connect}` becomes a clean clickable
+  `[ip:port](url)` link. Unset falls back to plain `ip:port` text.
+
+The `tr1ckhouse` branch adds a few more env vars for QL-specific features
+(`TR1CKHOUSE_ROSTER_API_URL`, `TR1CKHOUSE_ROSTER_API_KEY`,
+`TR1CKHOUSE_EMOJI_RED`, `TR1CKHOUSE_EMOJI_BLUE`) — see `.env.example`.
+
 Upstream `master` is at https://github.com/discord-gamestatus/discord-gamestatus.
 
 ## Changelog

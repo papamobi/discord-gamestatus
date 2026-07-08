@@ -34,6 +34,7 @@ services:
       GS_SUPPORT_LINK: "${GS_SUPPORT_LINK}"
       GS_SCHEDULER_ADDR: "scheduler:1337"
       GS_QUERY_TIMEOUT: "${GS_QUERY_TIMEOUT}"
+      CONNECT_REDIRECT_URL: "${CONNECT_REDIRECT_URL:-}"
     env_file: .env
     restart: on-failure
     command: [ "--debug", "--verbose" ]
