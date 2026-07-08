@@ -97,8 +97,13 @@ export async function generateEmbed(
   const ipPort = (update as unknown as { ip?: string }).ip;
   const roster = ipPort ? await getRoster(ipPort) : null;
 
-  if (roster && !server.offline) {
+if (roster && !server.offline) {
     renderTr1ckhouseRoster(embed, roster);
+    // Fold gametype into footer for tr1ckhouse servers so it doesn't eat
+    // a whole embed row.
+    embed.setFooter({
+      text: `${dots[tick % dots.length]}  •  ${gametypeLabel(roster)}`,
+    });
   } else {
     renderGamedigPlayers(embed, update, server);
   }
@@ -187,9 +192,6 @@ function renderTr1ckhouseRoster(
   roster: Tr1ckhouseRoster
 ): void {
   const layout = resolveLayout(roster);
-
-  // Gametype label above teams — self-documenting mode display
-  embed.addField("\u200B", `**${gametypeLabel(roster)}**`, false);
 
   const isTeamGametype =
     roster.teams.red.length + roster.teams.blue.length > 0 ||
