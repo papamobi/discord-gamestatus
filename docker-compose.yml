@@ -38,6 +38,7 @@ services:
       TR1CKHOUSE_ROSTER_API_KEY: "${TR1CKHOUSE_ROSTER_API_KEY}"
       TR1CKHOUSE_EMOJI_RED: "${TR1CKHOUSE_EMOJI_RED:-🟥}"
       TR1CKHOUSE_EMOJI_BLUE: "${TR1CKHOUSE_EMOJI_BLUE:-🟦}"
+      CONNECT_REDIRECT_URL: "${CONNECT_REDIRECT_URL:-}"
     env_file: .env
     restart: on-failure
     command: [ "--debug", "--verbose" ]

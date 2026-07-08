@@ -118,14 +118,15 @@ export function shouldBlock(address: Address): boolean {
 }
 
 const parseConnect = function (connect: string, protocol: string) {
-  switch (protocol) {
-    case "valve":
-      return `<steam://connect/${connect}>`;
-    case "fivem":
-      return `<fivem://connect/${connect}>`;
-    default:
-      return connect;
+  const redirectUrl = process.env.CONNECT_REDIRECT_URL;
+  if (redirectUrl && protocol === "valve") {
+    const [ip, port] = connect.split(":");
+    const url = port
+      ? `${redirectUrl}?ip=${ip}&port=${port}`
+      : `${redirectUrl}?ip=${ip}`;
+    return `[${connect}](${url})`;
   }
+  return connect;
 };
 
 const parseMap = function (map: string, protocol: string) {
