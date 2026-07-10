@@ -3,7 +3,7 @@
 A open-source discord bot that actively monitors your game server and updates a discord message with the
 current status.
 
-- [Invite link](https://discordapp.com/oauth2/authorize?client_id=659050996730822665&permissions=126144&scope=bot)
+- [Invite link](https://discord.com/oauth2/authorize?client_id=1278673992634470463&permissions=126144&scope=bot%20applications.commands)
 - [Command documentation](https://gamestatus.douile.com/docs/user)
 - [Self-hosting documentation (WIP)](https://gamestatus.douile.com/docs/admin)
 - [Terms of usage (for public bot)](https://tr1ckhouse.net/gamestatus/terms.html)
