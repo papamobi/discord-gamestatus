@@ -44,7 +44,7 @@ export type UpdateOption = keyof UpdateOptions;
 
 export const DEFAULT_OPTIONS: UpdateOptions = {
   dots: ["⚪", "⚫"],
-  title: TitleLimit("{name} server status"),
+  title: TitleLimit("{name}"),
   offlineTitle: TitleLimit(`server **{name}**`),
   description: DescriptionLimit(
     "Playing {map} with {numplayers}/{maxplayers} players\nConnect with {connect}"
