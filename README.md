@@ -44,6 +44,26 @@ The `tr1ckhouse` branch adds a few more env vars for QL-specific features
 
 Upstream `master` is at https://github.com/discord-gamestatus/discord-gamestatus.
 
+### Tr1ckHouse roster integration
+
+The `tr1ckhouse` branch adds enriched embed rendering (per-team scores,
+K/D, damage, captures) using a central roster registry at `tr1ckhouse.net`.
+
+Three ways to use it:
+
+1. **Publish data only** — install the [tr1ckhouse_roster plugin](https://github.com/papamobi/tr1ckhouse-minqlx-plugins/tree/main/tr1ckhouse_roster)
+   on your QL server and request a key from mobi. Your server's data
+   shows up in the mobibot embeds. No bot deployment needed.
+
+2. **Read from central registry** — deploy this branch, set
+   `TR1CKHOUSE_ROSTER_API_URL=https://tr1ckhouse.net/rosters` and use a
+   key from mobi. Your bot renders enriched embeds for any server
+   publishing to the registry.
+
+3. **Run your own registry** — deploy this branch plus your own copy of
+   [tr1ckhouse-registry](https://github.com/papamobi/tr1ckhouse-registry).
+   Point QL servers at your endpoint. Fully independent setup.
+
 ## Changelog
 See [CHANGELOG](./CHANGELOG.md)
 
