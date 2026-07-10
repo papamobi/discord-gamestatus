@@ -31,12 +31,20 @@ differs from upstream in the following ways:
 
 ### Env vars added by this fork
 
-- `CONNECT_REDIRECT_URL` — optional HTTPS URL for the {connect} embed placeholder on Steam/Valve-protocol servers.
-  Discord no longer renders steam:// schemes as clickable
-  in embeds, so those links have been effectively dead. Set
-  this to a page that accepts `?ip=<ip>&port=<port>` and emits a
-  `steam://connect/...` launch, and `{connect}` becomes a clean clickable
-  `[ip:port](url)` link. Unset falls back to plain `ip:port` text.
+- `CONNECT_REDIRECT_URL` — optional HTTPS URL wrapped around the `{connect}`
+  embed placeholder on Steam/Valve-protocol servers. Discord no longer
+  renders `steam://` schemes as clickable in embeds, so those links have
+  been effectively dead. The bot appends `?ip=<ip>&port=<port>` to this
+  URL and renders `{connect}` as a clickable `[ip:port](url)` link. The
+  page at the URL is expected to handle the query params however it
+  likes — typically by emitting a `steam://connect/...` launch. If unset,
+  falls back to plain `ip:port` text.
+
+  We use a lightly-branded copy of [GModJoiner](https://github.com/SetCr4/GModJoiner)
+  by [SetCr4](https://github.com/SetCr4) at [tr1ckhouse.net/steam](https://tr1ckhouse.net/steam/),
+  which already accepts the expected params and works for any Steam server. To
+  self-host, clone the GModJoiner repo, drop it under your web root, and point
+  `CONNECT_REDIRECT_URL` at your instance.
 
 The `tr1ckhouse` branch adds a few more env vars for QL-specific features
 (`TR1CKHOUSE_ROSTER_API_URL`, `TR1CKHOUSE_ROSTER_API_KEY`,
