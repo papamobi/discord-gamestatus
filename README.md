@@ -56,7 +56,7 @@ Three ways to use it:
 
 1. **Publish data only** — install the [tr1ckhouse_roster plugin](https://github.com/papamobi/tr1ckhouse-minqlx-plugins/tree/main/tr1ckhouse_roster)
    on your QL server and request a key from mobi. Your server's data
-   shows up in the mobibot embeds. No bot deployment needed.
+   shows up in the GameStatus embeds. No bot deployment needed.
 
 2. **Read from central registry** — deploy this branch, set
    `TR1CKHOUSE_ROSTER_API_URL=https://tr1ckhouse.net/rosters` and use a
