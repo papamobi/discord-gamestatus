@@ -11,7 +11,7 @@ current status.
 
 ## Quick Start
 
-**For QL server operators — get your server rendered in GameStatus embeds:**
+**For QL server owners — get your server rendered in GameStatus embeds:**
 
 1. Install the [tr1ckhouse_roster plugin](https://github.com/papamobi/tr1ckhouse-minqlx-plugins/tree/main/tr1ckhouse_roster) on your QL server.
 2. Add two cvars to `server.cfg`:
