@@ -11,11 +11,21 @@ current status.
 
 ## Quick Start
 
-1. Invite [GameStatus](https://discord.com/oauth2/authorize?client_id=1278673992634470463&permissions=126144&scope=bot%20applications.commands) to your guild, or `git clone` + `docker-compose up -d` to self-host. Read self-hosting documentation above for more information.
-2. Copy `.env.example` to `.env`, fill in `DISCORD_API_KEY` and `DATABASE_PASS`.
-3. Run `!status <game> <ip>` (or `/status`) in Discord to create a status message.
+**For QL server operators — get your server rendered in GameStatus embeds:**
 
-For QL-specific features (enriched rosters), see the [`tr1ckhouse` branch](https://github.com/papamobi/discord-gamestatus/tree/tr1ckhouse).
+1. Install the [tr1ckhouse_roster plugin](https://github.com/papamobi/tr1ckhouse-minqlx-plugins/tree/main/tr1ckhouse_roster) on your QL server.
+2. Add two cvars to `server.cfg`:
+set qlx_tr1ckhouseUrl "https://tr1ckhouse.net/roster"
+set qlx_tr1ckhouseKey "<API_Key>"
+3. Request the API key — DM `f.mobile` on Discord, or join the [Tr1ckHouse Discord](https://discord.gg/8sjDdcz).
+4. `!load tr1ckhouse_roster` — your server's data now shows in GameStatus embeds (K/D, damage, team scores, spectators).
+
+**Or self-host your own bot instance:**
+
+1. `git clone -b tr1ckhouse https://github.com/papamobi/discord-gamestatus`
+2. Copy `.env.example` to `.env`, fill in required values.
+3. Choose one of the three integration modes documented in [Tr1ckHouse roster integration](#tr1ckhouse-roster-integration).
+4. `docker-compose up -d`. (Read self-hosting documentation at the top of this page for more information.)
 
 ## Fork notes
 
