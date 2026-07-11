@@ -9,6 +9,14 @@ current status.
 - [Terms of usage (for public bot)](https://tr1ckhouse.net/gamestatus/terms.html)
 - [Privacy policy (for public bot)](https://tr1ckhouse.net/gamestatus/privacy.html)
 
+## Quick Start
+
+1. Invite [GameStatus](https://discord.com/oauth2/authorize?client_id=1278673992634470463&permissions=126144&scope=bot%20applications.commands) to your guild, or `git clone` + `docker-compose up -d` to self-host. Read self-hosting documentation above for more information.
+2. Copy `.env.example` to `.env`, fill in `DISCORD_API_KEY` and `DATABASE_PASS`.
+3. Run `!status <game> <ip>` (or `/status`) in Discord to create a status message.
+
+For QL-specific features (enriched rosters), see the [`tr1ckhouse` branch](https://github.com/papamobi/discord-gamestatus/tree/tr1ckhouse).
+
 ## Fork notes
 
 This is a fork maintained by [papamobi](https://github.com/papamobi). It
