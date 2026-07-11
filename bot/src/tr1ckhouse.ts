@@ -14,7 +14,6 @@ export interface Tr1ckhousePlayer {
   kills: number;
   deaths: number;
   damage: number;
-  captures: number;
   ping: number;
 }
 

@@ -1,16 +1,6 @@
 /*
 discord-gamestatus: Game server monitoring via discord API
 Copyright (C) 2019-2022 Douile
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
 */
 
 import { MessageEmbed } from "discord.js-light";
@@ -39,6 +29,7 @@ function serverFormat(str: string, server: State) {
 
 const stripQ3Colors = (s: string) => s.replace(/\^[0-9]/g, "");
 const FIGURE_SPACE = "\u2007";
+
 const EMOJI_RED = process.env.TR1CKHOUSE_EMOJI_RED || "🟥";
 const EMOJI_BLUE = process.env.TR1CKHOUSE_EMOJI_BLUE || "🟦";
 
@@ -97,7 +88,7 @@ export async function generateEmbed(
   const ipPort = (update as unknown as { ip?: string }).ip;
   const roster = ipPort ? await getRoster(ipPort) : null;
 
-if (roster && !server.offline) {
+  if (roster && !server.offline) {
     renderTr1ckhouseRoster(embed, roster);
     // Fold gametype into footer for tr1ckhouse servers so it doesn't eat
     // a whole embed row.
@@ -115,8 +106,8 @@ if (roster && !server.offline) {
 // tr1ckhouse enriched rendering
 // -----------------------------------------------------------------------------
 
-type PrimaryMode = "score" | "kd" | "caps_kd";
-type SortKey = "kills" | "score" | "captures";
+type PrimaryMode = "score" | "kd";
+type SortKey = "kills" | "score";
 
 interface LayoutConfig {
   primary: PrimaryMode;
@@ -125,19 +116,19 @@ interface LayoutConfig {
 }
 
 const GAMETYPE_LAYOUTS: Record<string, LayoutConfig> = {
-  "0":  { primary: "kd",      showDamage: true,  sortBy: "kills"    }, // FFA
-  "1":  { primary: "kd",      showDamage: true,  sortBy: "kills"    }, // Duel
-  "2":  { primary: "score",   showDamage: false, sortBy: "score"    }, // Race
-  "3":  { primary: "score",   showDamage: true,  sortBy: "score"    }, // TDM
-  "4":  { primary: "score",   showDamage: true,  sortBy: "score"    }, // Clan Arena
-  "5":  { primary: "caps_kd", showDamage: true,  sortBy: "captures" }, // CTF
-  "6":  { primary: "caps_kd", showDamage: true,  sortBy: "captures" }, // One Flag CTF
-  "7":  { primary: "score",   showDamage: true,  sortBy: "score"    }, // Overload
-  "8":  { primary: "score",   showDamage: true,  sortBy: "score"    }, // Harvester
-  "9":  { primary: "kd",      showDamage: true,  sortBy: "kills"    }, // FreezeTag
-  "10": { primary: "score",   showDamage: true,  sortBy: "score"    }, // Domination
-  "11": { primary: "score",   showDamage: true,  sortBy: "score"    }, // A&D
-  "12": { primary: "kd",      showDamage: true,  sortBy: "kills"    }, // Red Rover
+  "0":  { primary: "kd",    showDamage: true,  sortBy: "kills" }, // FFA
+  "1":  { primary: "kd",    showDamage: true,  sortBy: "kills" }, // Duel
+  "2":  { primary: "score", showDamage: false, sortBy: "score" }, // Race
+  "3":  { primary: "kd",    showDamage: true,  sortBy: "kills" }, // TDM
+  "4":  { primary: "kd",    showDamage: true,  sortBy: "kills" }, // Clan Arena
+  "5":  { primary: "kd",    showDamage: true,  sortBy: "kills" }, // CTF
+  "6":  { primary: "kd",    showDamage: true,  sortBy: "kills" }, // One Flag CTF
+  "7":  { primary: "kd",    showDamage: true,  sortBy: "kills" }, // Overload
+  "8":  { primary: "kd",    showDamage: true,  sortBy: "kills" }, // Harvester
+  "9":  { primary: "kd",    showDamage: true,  sortBy: "kills" }, // FreezeTag
+  "10": { primary: "kd",    showDamage: true,  sortBy: "kills" }, // Domination
+  "11": { primary: "kd",    showDamage: true,  sortBy: "kills" }, // A&D
+  "12": { primary: "kd",    showDamage: true,  sortBy: "kills" }, // Red Rover
 };
 const DEFAULT_LAYOUT: LayoutConfig = {
   primary: "score",
@@ -164,7 +155,6 @@ const GAMETYPE_NAMES: Record<string, string> = {
 const formatDamage = (dmg: number) => `${(dmg / 1000).toFixed(1)}k`;
 const formatKd = (p: Tr1ckhousePlayer) => `${p.kills}/${p.deaths}`;
 const formatScore = (p: Tr1ckhousePlayer) => String(p.score);
-const formatCaps = (p: Tr1ckhousePlayer) => String(p.captures);
 
 function resolveLayout(roster: Tr1ckhouseRoster): LayoutConfig {
   const base = GAMETYPE_LAYOUTS[roster.gametype] ?? DEFAULT_LAYOUT;
@@ -236,7 +226,6 @@ function renderTr1ckhouseRoster(
 
 interface ColumnWidths {
   primary: number;
-  caps: number;
   dmg: number;
 }
 
@@ -244,17 +233,10 @@ function computeColumnWidths(
   players: Tr1ckhousePlayer[],
   layout: LayoutConfig
 ): ColumnWidths {
-  let primaryLens: number[];
-  let capsLens: number[] = [];
-
-  if (layout.primary === "caps_kd") {
-    capsLens = players.map((p) => formatCaps(p).length);
-    primaryLens = players.map((p) => formatKd(p).length);
-  } else if (layout.primary === "kd") {
-    primaryLens = players.map((p) => formatKd(p).length);
-  } else {
-    primaryLens = players.map((p) => formatScore(p).length);
-  }
+  const primaryLens =
+    layout.primary === "kd"
+      ? players.map((p) => formatKd(p).length)
+      : players.map((p) => formatScore(p).length);
 
   const dmgLens = layout.showDamage
     ? players.map((p) => formatDamage(p.damage).length)
@@ -262,7 +244,6 @@ function computeColumnWidths(
 
   return {
     primary: Math.max(1, ...primaryLens),
-    caps: Math.max(1, ...capsLens),
     dmg: Math.max(1, ...dmgLens),
   };
 }
@@ -274,7 +255,7 @@ function formatTeam(
 ): string {
   if (players.length === 0) return "_empty_";
 
-  const nameLimit = layout.primary === "caps_kd" ? 12 : 14;
+  const nameLimit = 14;
 
   return players
     .map((p) => {
@@ -284,12 +265,7 @@ function formatTeam(
 
       const parts: string[] = [];
 
-      if (layout.primary === "caps_kd") {
-        const caps = formatCaps(p).padStart(widths.caps, FIGURE_SPACE);
-        const kd = formatKd(p).padStart(widths.primary, FIGURE_SPACE);
-        parts.push(`\`${caps}\``);
-        parts.push(`\`${kd}\``);
-      } else if (layout.primary === "kd") {
+      if (layout.primary === "kd") {
         const kd = formatKd(p).padStart(widths.primary, FIGURE_SPACE);
         parts.push(`\`${kd}\``);
       } else {
