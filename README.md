@@ -17,7 +17,7 @@ current status.
 2. Add two cvars to `server.cfg`:
 set qlx_tr1ckhouseUrl "https://tr1ckhouse.net/roster"
 set qlx_tr1ckhouseKey "<API_Key>"
-3. Request the API key — DM `f.mobile` on Discord, or join the [Tr1ckHouse Discord](https://discord.gg/8sjDdcz).
+3. Request the API key — DM `f.mobile` on Discord, or join the [GameStatus Support Discord](https://discord.gg/CbRmKkCrKm).
 4. `!load tr1ckhouse_roster` — your server's data now shows in GameStatus embeds (K/D, damage, team scores, spectators).
 
 **Or self-host your own bot instance:**
