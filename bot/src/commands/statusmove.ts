@@ -58,8 +58,19 @@ export async function call(context: CommandContext): Promise<void> {
 
   let toMove: Options;
   if (guildContext instanceof MessageContext) {
-    await guildContext.reply({ content: "todo" });
-    return;
+    const args = guildContext.options();
+    if (args.length < 3) {
+      await guildContext.reply({
+        content: "Usage: !statusmove <from_channel> <message_id> <to_channel>\nChannels can be #mentions or raw IDs. Message ID: right-click message → Copy Message ID (Developer Mode).",
+      });
+      return;
+    }
+    const strip = (s: string) => s.replace(/^<#/, "").replace(/>$/, "");
+    toMove = {
+      channel: strip(args[0]) as Snowflake,
+      message: args[1],
+      destinationChannel: strip(args[2]) as Snowflake,
+    };
   } else if (guildContext instanceof CommandInteractionContext) {
     const opts = guildContext.inner().options;
     toMove = {
