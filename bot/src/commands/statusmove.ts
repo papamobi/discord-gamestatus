@@ -24,7 +24,12 @@ import { ApplicationCommandOptionData, Snowflake } from "discord.js-light";
 
 export const name = "statusmove";
 export const check = isAdmin;
-export const help = "Move a status to another channel";
+export const help = `Move a status message to another channel.
+Use cases:
+  - Reorder statuses in a channel (move to same channel to bump to bottom): \`!statusmove #ch <msg_id> #ch\`
+  - Migrate to a new channel: \`!statusmove #old <msg_id> #new\`
+
+Channels can be #mentions or raw IDs. Message ID: right-click → Copy Message ID (Developer Mode required).`;
 export const options: ApplicationCommandOptionData[] = [
   {
     name: "from_id",
