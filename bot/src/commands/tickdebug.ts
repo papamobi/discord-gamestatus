@@ -20,7 +20,7 @@ import { CommandContext } from "../structs/CommandContext";
 
 export const name = "tickdebug";
 export const check = isBotOwner;
-export const help = "Debug status updates`";
+export const help = "Debug status updates";
 export const disableSlash = true;
 
 export async function call(context: CommandContext): Promise<void> {

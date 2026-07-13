@@ -46,7 +46,7 @@ export async function call(context: CommandContext): Promise<void> {
           title: "Help",
           color: EMBED_COLOR,
           description:
-            "[More detailed documentation here](https://gamestatus.douile.com/docs/user)\n" +
+            "[Command reference](https://gamestatus.douile.com/docs/user) · [Fork on GitHub](https://github.com/papamobi/discord-gamestatus)\n" +
             Array.from(context.client().commands.entries())
               .filter((cmd) =>
                 cmd[0] !== "help" && cmd[1].check ? cmd[1].check(context) : true
