@@ -4,6 +4,7 @@
 
 ### Added
 
+- **`/status` game autocomplete**: slash command now suggests matching game IDs from gamedig's 321 supported protocols as the user types.
 - **Tr1ckHouse roster integration** (tr1ckhouse branch): enriched embed rendering for participating QL servers with per-team scores, K/D, damage, gametype-aware layouts, and spectator lists. Fetched from a central HTTPS registry populated by the [tr1ckhouse_roster minqlx plugin](https://github.com/papamobi/tr1ckhouse-minqlx-plugins/tree/main/tr1ckhouse_roster).
 - **Custom team emojis** (tr1ckhouse branch): configurable RED/BLUE team emojis via `TR1CKHOUSE_EMOJI_RED` and `TR1CKHOUSE_EMOJI_BLUE` env vars, with Unicode square fallback.
 - **HTTPS `{connect}` redirector** support via `CONNECT_REDIRECT_URL` env var. Discord no longer renders `steam://` schemes as clickable in embeds; the bot now wraps `{connect}` as a `[ip:port](url)` link pointing at a redirector page.
