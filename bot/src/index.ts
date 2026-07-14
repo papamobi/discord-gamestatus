@@ -39,6 +39,7 @@ import {
 } from "./structs/CommandContext";
 import SavePSQL from "./structs/save/SavePSQL";
 import { readJSONOrEmpty } from "./utils";
+import { GAMEDIG_GAME_IDS } from "./gamedigGames";
 
 const INVITE_FLAGS = [
   "VIEW_CHANNEL",
@@ -233,7 +234,23 @@ async function onMessage(oMessage: Discord.Message) {
   verboseLog(`Unkown command ${command}`);
 }
 
+async function handleAutocomplete(interaction: Discord.AutocompleteInteraction) {
+  if (interaction.commandName !== "status") return;
+  const focused = interaction.options.getFocused(true);
+  if (focused.name !== "game") return;
+
+  const q = String(focused.value).toLowerCase();
+  const matches = GAMEDIG_GAME_IDS
+    .filter((id) => id.toLowerCase().includes(q))
+    .slice(0, 25)
+    .map((id) => ({ name: id, value: id }));
+
+  await interaction.respond(matches);
+}
 async function onInteraction(interaction: Discord.Interaction) {
+  if (interaction.isAutocomplete()) {
+    return handleAutocomplete(interaction);
+  }
   if (!interaction.isCommand()) return;
 
   const context = new CommandInteractionContext(interaction);
