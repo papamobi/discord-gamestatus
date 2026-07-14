@@ -35,6 +35,7 @@ export const options: ApplicationCommandOptionData[] = [
     type: "STRING",
     name: "game",
     description: "Game type for query",
+	autocomplete: true,
     //    choices: gameList().map(g => { return { name: g.keys[0], value: g.keys[0] }}),
     required: true,
   },
