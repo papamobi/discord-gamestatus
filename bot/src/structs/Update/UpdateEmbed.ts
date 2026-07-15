@@ -21,14 +21,17 @@ import Update from "../Update";
 import { UpdateOptions } from "./UpdateOptions";
 import { FORMAT_PROPERTIES } from "../../constants";
 import { State } from "../../query";
+import { countryCode } from "../../geoip";
+import { codeToFlag } from "../../geoip";
 
-function serverFormat(str: string, server: State) {
+function serverFormat(str: string, server: State, flag: string = "") {
   for (const prop of <[keyof State]>FORMAT_PROPERTIES) {
     str = str.replace(
       new RegExp(`\\{${prop}\\}`, "gi"),
       server[prop]?.toString() || ""
     );
   }
+  str = str.replace(/\{flag\}/gi, flag);
   return str;
 }
 
@@ -82,18 +85,23 @@ export async function generateEmbed(
   server: State,
   tick: number
 ): Promise<MessageEmbed> {
-  const players = server.realPlayers === null ? [] : server.realPlayers;
-
   const isOffline = server.offline ? 1 : 0;
+
+  // Look up country flag once for the whole embed
+  const ipPort = (update as unknown as { ip?: string }).ip;
+  const ipOnly = ipPort ? ipPort.split(":")[0] : null;
+  const flag = ipOnly ? codeToFlag(await countryCode(ipOnly)) : "";
 
   const embed = new MessageEmbed({
     title: serverFormat(
       update.getOption(OPT_TITLE[isOffline]) as string,
-      server
+      server,
+      flag,
     ),
     description: serverFormat(
       update.getOption(OPT_DESCRIPTION[isOffline]) as string,
-      server
+      server,
+      flag,
     ),
     color: update.getOption(OPT_COLOR[isOffline]) as number,
     timestamp: Date.now(),
@@ -104,6 +112,8 @@ export async function generateEmbed(
 
   const image = update.getOption(OPT_IMAGE[isOffline]) as string;
   if (image.length > 0) embed.setThumbnail(image);
+  
+  const players = server.realPlayers === null ? [] : server.realPlayers;
 
   // Pre-extract score and clean name once per player
   const enriched = players.map((p) => ({
