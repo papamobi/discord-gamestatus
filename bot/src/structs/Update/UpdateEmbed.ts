@@ -268,7 +268,7 @@ function formatTeam(
   if (layout.showDamage) {
     headerParts.push("_dmg_");
   }
-  const header = "-# " + headerParts.join("   ·   ");
+  const header = "-# " + headerParts.join("\u2007·\u2007");
 
   const rows = players
     .map((p) => {
