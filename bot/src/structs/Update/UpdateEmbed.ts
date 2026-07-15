@@ -6,6 +6,7 @@ Copyright (C) 2019-2022 Douile
 import { MessageEmbed } from "discord.js-light";
 import { truncateEmbed } from "@douile/bot-utilities";
 import { Player } from "gamedig";
+import { GAMEDIG_GAME_NAMES } from "../../gamedigNames";
 
 import Update from "../Update";
 import { UpdateOptions } from "./UpdateOptions";
@@ -89,7 +90,13 @@ export async function generateEmbed(
   });
 
   const dots = update.getOption("dots") as string[];
-  embed.setFooter({ text: dots[tick % dots.length] });
+  const gameId = (update as unknown as { type?: string }).type;
+  const gameName = gameId ? GAMEDIG_GAME_NAMES[gameId] || gameId : null;
+  embed.setFooter({
+    text: gameName
+      ? `${dots[tick % dots.length]}  •  ${gameName}`
+      : dots[tick % dots.length],
+  });
 
   const image = update.getOption(OPT_IMAGE[isOffline]) as string;
   if (image.length > 0) embed.setThumbnail(image);
