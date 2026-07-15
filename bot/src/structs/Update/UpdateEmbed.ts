@@ -257,7 +257,20 @@ function formatTeam(
 
   const nameLimit = 14;
 
-  return players
+  // Header row showing what the columns represent
+  const headerParts: string[] = [];
+  if (layout.primary === "kd") {
+    headerParts.push("_k/d_");
+  } else {
+    headerParts.push("_scr_");
+  }
+  headerParts.push("_player_");
+  if (layout.showDamage) {
+    headerParts.push("_dmg_");
+  }
+  const header = "-# " + headerParts.join("   ·   ");
+
+  const rows = players
     .map((p) => {
       const name = stripQ3Colors(p.name);
       const trimmed =
@@ -282,6 +295,8 @@ function formatTeam(
       return parts.join(" ");
     })
     .join("\n");
+
+  return `${header}\n${rows}`;
 }
 
 // -----------------------------------------------------------------------------
