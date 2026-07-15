@@ -94,7 +94,6 @@ export async function generateEmbed(
   const image = update.getOption(OPT_IMAGE[isOffline]) as string;
   if (image.length > 0) embed.setThumbnail(image);
 
-  const ipPort = (update as unknown as { ip?: string }).ip;
   const roster = ipPort ? await getRoster(ipPort) : null;
 
   if (roster && !server.offline) {
