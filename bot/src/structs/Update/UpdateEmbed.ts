@@ -292,7 +292,7 @@ function formatTeam(
         parts.push(`\`${formatDamage(p.damage).padStart(widths.dmg, FIGURE_SPACE)}\``);
       }
 
-      return parts.join(" ");
+      return parts.join("\u2007");
     })
     .join("\n");
 
