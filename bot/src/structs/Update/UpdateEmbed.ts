@@ -108,7 +108,7 @@ export async function generateEmbed(
     // Fold gametype into footer for tr1ckhouse servers so it doesn't eat
     // a whole embed row.
     embed.setFooter({
-      text: `${dots[tick % dots.length]}  •  ${gametypeLabel(roster)}`,
+      text: `${dots[tick % dots.length]}  •  Quake Live  •  ${gametypeLabel(roster)}`,
     });
   } else {
     renderGamedigPlayers(embed, update, server);
