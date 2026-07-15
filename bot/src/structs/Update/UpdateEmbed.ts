@@ -16,14 +16,16 @@ import {
   Tr1ckhousePlayer,
   Tr1ckhouseRoster,
 } from "../../tr1ckhouse";
+import { countryCode, codeToFlag } from "../../geoip";
 
-function serverFormat(str: string, server: State) {
+function serverFormat(str: string, server: State, flag: string = "") {
   for (const prop of <[keyof State]>FORMAT_PROPERTIES) {
     str = str.replace(
       new RegExp(`\\{${prop}\\}`, "gi"),
       server[prop]?.toString() || ""
     );
   }
+  str = str.replace(/\{flag\}/gi, flag);
   return str;
 }
 
@@ -66,14 +68,21 @@ export async function generateEmbed(
 ): Promise<MessageEmbed> {
   const isOffline = server.offline ? 1 : 0;
 
+  // Look up country flag once for the whole embed
+  const ipPort = (update as unknown as { ip?: string }).ip;
+  const ipOnly = ipPort ? ipPort.split(":")[0] : null;
+  const flag = ipOnly ? codeToFlag(await countryCode(ipOnly)) : "";
+
   const embed = new MessageEmbed({
     title: serverFormat(
       update.getOption(OPT_TITLE[isOffline]) as string,
-      server
+      server,
+      flag,
     ),
     description: serverFormat(
       update.getOption(OPT_DESCRIPTION[isOffline]) as string,
-      server
+      server,
+      flag,
     ),
     color: update.getOption(OPT_COLOR[isOffline]) as number,
     timestamp: Date.now(),
