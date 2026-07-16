@@ -4,6 +4,8 @@
 
 ### Added
 
+- **`{flag}` placeholder**: resolves to the server's country flag emoji via IP geolocation (ip-api.com, 24h cache).
+- **Game name in embed footer**: standard renders show the game name (bundles 321-name mapping for gamedig 4.3.1 protocols).
 - **`/status` game autocomplete**: slash command now suggests matching game IDs from gamedig's 321 supported protocols as the user types.
 - **Tr1ckHouse roster integration** (tr1ckhouse branch): enriched embed rendering for participating QL servers with per-team scores, K/D, damage, gametype-aware layouts, and spectator lists. Fetched from a central HTTPS registry populated by the [tr1ckhouse_roster minqlx plugin](https://github.com/papamobi/tr1ckhouse-minqlx-plugins/tree/main/tr1ckhouse_roster).
 - **Custom team emojis** (tr1ckhouse branch): configurable RED/BLUE team emojis via `TR1CKHOUSE_EMOJI_RED` and `TR1CKHOUSE_EMOJI_BLUE` env vars, with Unicode square fallback.
