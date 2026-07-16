@@ -36,7 +36,17 @@ function serverFormat(str: string, server: State, flag: string = "") {
   return str;
 }
 
-const stripQ3Colors = (s: string) => s.replace(/\^[0-9]/g, "");
+const stripGameColors = (s: string) =>
+  s
+    // Quake 3 / Quake Live / Doom 3 / Savage 2
+    // ^X + 6-hex (long form) or ^ + single char (short form)
+    .replace(/\^(X.{6}|.)/g, "")
+    // Nadeo / Trackmania — $ + 3-hex or single letter
+    .replace(/\$([0-9a-f]{3}|[a-z])/gi, "")
+    // Armagetron — 0xRRGGBB
+    .replace(/0x[0-9a-f]{6}/g, "")
+    // Unreal 2 / Gamespy 2 (armygame) — escape codes and control chars
+    .replace(/\x1b...|[\x00-\x1a]/g, "");
 
 // Figure space — a non-whitespace Unicode character that renders at the width
 // of a digit in monospace fonts. Used instead of regular spaces inside inline
@@ -162,7 +172,7 @@ export async function generateEmbed(
         const score = hasScore
           ? String(e.score).padStart(widestScore, FIGURE_SPACE)
           : "";
-        const name = stripQ3Colors(e.name);
+        const name = stripGameColors(e.name);
         const trimmed =
           name.length > nameLimit ? name.slice(0, nameLimit - 1) + "…" : name;
         return hasScore ? `\`${score}\` · ${trimmed}` : trimmed;
