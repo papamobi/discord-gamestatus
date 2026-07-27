@@ -11,8 +11,8 @@ current status.
 
 ## Quick Start
 
-1. Invite [GameStatus](https://discord.com/oauth2/authorize?client_id=1278673992634470463&permissions=126144&scope=bot%20applications.commands) to your guild, or `git clone` + `docker-compose up -d` to self-host. Read self-hosting documentation above for more information.
-2. Copy `.env.example` to `.env`, fill in `DISCORD_API_KEY` and `DATABASE_PASS`.
+1. Invite [GameStatus](https://discord.com/oauth2/authorize?client_id=1278673992634470463&permissions=126144&scope=bot%20applications.commands) to your guild, or self-host — read self-hosting documentation above for more information.
+2. Copy `.env.example` to `.env`, fill in `DISCORD_API_KEY` and `DATABASE_PASS`. (ONLY if self-hosting)
 3. Run `!status <game> <ip>` or `/status game:<game> ip:<ip>` in Discord to create a status message.
 
 **For QL server owners — get your server rendered in GameStatus embeds:**
