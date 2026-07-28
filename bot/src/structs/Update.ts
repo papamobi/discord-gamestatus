@@ -46,6 +46,7 @@ export interface UpdateConstructorOptions {
   type: string;
   ip: string;
   name?: string;
+  position?: number;
   options?: UpdateOptions;
 }
 
@@ -74,6 +75,7 @@ export default class Update extends Serializable {
   public type: string;
   public ip: string;
   public name: string;
+  public position: number;
   public options: UpdateOptions = {};
 
   constructor(
@@ -94,6 +96,7 @@ export default class Update extends Serializable {
     this.type = opts?.type || "Error";
     this.ip = opts?.ip || "Error";
     this.name = opts?.name || "Error";
+	this.position = opts?.position ?? 0;
     this.options = opts?.options || {};
 
     if (objs) {

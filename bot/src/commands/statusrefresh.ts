@@ -1,34 +1,28 @@
 /*
 discord-gamestatus: Game server monitoring via discord API
 Copyright (C) 2021-2022 Douile
-
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
-
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
-
 import { TextChannel } from "discord.js-light";
-
+import Update from "../structs/Update";
 import { isAdmin } from "../checks";
 import { EMBED_COLOR } from "../constants";
 import { channelFirstArg } from "../utils";
 import { CommandContext, MessageContext } from "../structs/CommandContext";
-
 export const name = "statusrefresh";
-export const help = "Force bot to resend all status messages (next update).";
+export const help = "Force bot to resend all status messages in the channel, in position order.";
 export const check = isAdmin;
-
 export async function call(context: CommandContext): Promise<void> {
   let channel;
   if (context instanceof MessageContext) {
     const args = context.options();
-
     try {
       channel = await channelFirstArg(context.inner(), args);
     } catch {
@@ -37,12 +31,9 @@ export async function call(context: CommandContext): Promise<void> {
   } else {
     channel = context.channel();
   }
-
   if (!channel || !(channel instanceof TextChannel)) return;
-
   // Defer here because database access can take some time.
   await context.deferReply({ content: "Loading...", ephemeral: true });
-
   let statuses = await context.updateCache().get({
     channel: channel.id,
     guild: channel.guild.id,
@@ -52,7 +43,6 @@ export async function call(context: CommandContext): Promise<void> {
   } else if (!Array.isArray(statuses)) {
     statuses = [statuses];
   }
-
   if (statuses.length === 0) {
     await context.editReply({
       embeds: [
@@ -67,27 +57,39 @@ export async function call(context: CommandContext): Promise<void> {
     return;
   }
 
+  // Sort by position so we repost top-to-bottom in the DB's intended order.
+  const ordered = [...statuses].sort(
+    (a: Update, b: Update) => (a.position ?? 0) - (b.position ?? 0)
+  );
+
   await context.editReply({
     embeds: [
       {
         title: "Working...",
-        description: `Refreshing ${statuses.length} updates`,
+        description: `Refreshing ${ordered.length} updates`,
         color: EMBED_COLOR,
       },
     ],
     ephemeral: true,
   });
 
-  for (const status of statuses) {
+  // First pass: delete every existing message and clear message_id.
+  for (const status of ordered) {
     await status.deleteMessage(context.client());
-    await status.setMessage(context.client(), undefined); // Clear message
+    await status.setMessage(context.client(), undefined);
+  }
+
+  // Second pass: repost each one sequentially in position order.
+  // Sequential (not Promise.all) so Discord shows them in the same order.
+  for (const status of ordered) {
+    await status.send(context.client(), 0);
   }
 
   const replyOptions = {
     embeds: [
       {
         title: "Done",
-        description: `Refreshed ${statuses.length} updates`,
+        description: `Refreshed ${ordered.length} updates`,
         color: EMBED_COLOR,
       },
     ],
