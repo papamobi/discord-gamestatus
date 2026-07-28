@@ -10,6 +10,7 @@ the Free Software Foundation, either version 3 of the License, or
 import Update from "./structs/Update";
 import { EMBED_COLOR } from "./constants";
 import { CommandContext } from "./structs/CommandContext";
+import { markChannelRefreshing } from "./channelRefreshLock";
 
 export type MoveDirection = "up" | "down";
 
@@ -109,6 +110,8 @@ export async function moveStatusByIndex(
     (a, b) => (a.position ?? 0) - (b.position ?? 0)
   );
 
+  markChannelRefreshing(target.channel!);
+
   for (const status of reordered) {
     await status.deleteMessage(context.client());
     await status.setMessage(context.client(), undefined);
@@ -122,7 +125,7 @@ export async function moveStatusByIndex(
     embeds: [
       {
         title: "Done",
-        description: `Moved status #${index} ${direction}. ${reordered.length} statuses in the channel have been reposted in the new order.`,
+        description: `Moved #${index} ${direction} — re-check IDs with \`/statusmod list\`.`,
         color: EMBED_COLOR,
       },
     ],

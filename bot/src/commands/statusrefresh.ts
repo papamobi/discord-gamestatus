@@ -16,6 +16,7 @@ import { isAdmin } from "../checks";
 import { EMBED_COLOR } from "../constants";
 import { channelFirstArg } from "../utils";
 import { CommandContext, MessageContext } from "../structs/CommandContext";
+import { markChannelRefreshing } from "../channelRefreshLock";
 export const name = "statusrefresh";
 export const help = "Force bot to resend all status messages in the channel, in position order.";
 export const check = isAdmin;
@@ -73,6 +74,8 @@ export async function call(context: CommandContext): Promise<void> {
     ephemeral: true,
   });
 
+  markChannelRefreshing(channel.id);
+  
   // First pass: delete every existing message and clear message_id.
   for (const status of ordered) {
     await status.deleteMessage(context.client());

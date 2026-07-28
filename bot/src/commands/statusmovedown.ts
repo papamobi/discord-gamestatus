@@ -20,7 +20,7 @@ import { warnLog } from "../debug";
 export const name = "statusmovedown";
 export const check = isAdmin;
 export const help =
-  "Move a status one position down within its channel.\nUsage: `!statusmovedown <id>` (find IDs with `!statusmod`).";
+  "Move a status one position down within its channel.\nUsage: `/statusmovedown <id>` (find IDs with `/statusmod list`).";
 
 const KEY_ID = "status-id";
 

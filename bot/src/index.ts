@@ -24,6 +24,7 @@ import Command from "./structs/Command";
 import Client, { ClientConfig } from "./structs/Client";
 import Message from "./structs/Message";
 import Update from "./structs/Update";
+import { isChannelRefreshing } from "./channelRefreshLock";
 import {
   setDebugFlag,
   debugLog,
@@ -153,8 +154,12 @@ function onScheduledData(client: Client) {
 
       if (json) {
         const update = SavePSQL.rowToUpdate(json);
-        verboseLog("Requested to update", update);
-        doUpdate(client, update, 0).catch(warnLog);
+        if (isChannelRefreshing(update.channel)) {
+          verboseLog(`Skipping scheduled update for [${update.ID()}]: channel is refreshing`);
+        } else {
+          verboseLog("Requested to update", update);
+          doUpdate(client, update, 0).catch(warnLog);
+        }
       }
 
       newLineIndex = data.indexOf("\n");
