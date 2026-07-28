@@ -4,6 +4,8 @@
 
 ### Added
 
+- **`!statusmoveup` / `!statusmovedown` commands** (slash and message): reorder a status within its channel. Adds a `position` column to the `statuses` table (schema v5, backfilled from id) and reposts every message in the affected channel sequentially in the new order so Discord's visual order matches DB position. Includes a 60s per-channel refresh lock preventing scheduler-driven updates from racing with the repost.
+- **`!statusrefresh` now reposts in position order**: previously reposted in parallel (arbitrary order); now sorts by `position` and reposts sequentially.
 - **`{flag}` placeholder**: resolves to the server's country flag emoji via IP geolocation (ip-api.com, 24h cache).
 - **Game name in embed footer**: standard renders show the game name (bundles 321-name mapping for gamedig 4.3.1 protocols).
 - **`/status` game autocomplete**: slash command now suggests matching game IDs from gamedig's 321 supported protocols as the user types.
