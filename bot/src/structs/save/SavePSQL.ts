@@ -72,7 +72,7 @@ export default class SavePSQL implements SaveInterface {
           (guild_id, channel_id, message_id, type, ip, name, state, dots, title, offline_title, description, offline_description,\
           color, offline_color, image, offline_image, columns, max_edits, connect_update, disconnect_update, position) VALUES \
           ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, \
-          (SELECT COALESCE(MAX(position), 0) + 1 FROM statuses WHERE channel_id = $2))",
+          (SELECT COALESCE(MAX(position), 0) + 1 FROM statuses WHERE channel_id = $2::varchar(128)))",
         [
           status.guild,
           status.channel,
