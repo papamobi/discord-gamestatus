@@ -34,6 +34,7 @@ differs from upstream in the following ways:
 - **OpenArena protocol support**: decodes personal score from gamedig's
   packed `raw.frags` field and strips the name prefix
 - **`!statusmoveup` / `!statusmovedown`**: reorder statuses within a Discord channel. Adds a `position` column and reposts affected messages in order.
+- **`/statuscheck`**: one-shot server query, no status saved. Available to all users, ephemeral.
 - **Bot built locally** from this fork rather than pulling the upstream
   prebuilt image
 - **Pinned dependencies** via `npm ci` + `bot/package-lock.json` for
