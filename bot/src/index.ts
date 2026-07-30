@@ -240,7 +240,7 @@ async function onMessage(oMessage: Discord.Message) {
 }
 
 async function handleAutocomplete(interaction: Discord.AutocompleteInteraction) {
-  if (interaction.commandName !== "status") return;
+  if (interaction.commandName !== "status" && interaction.commandName !== "statuscheck") return;
   const focused = interaction.options.getFocused(true);
   if (focused.name !== "game") return;
 
