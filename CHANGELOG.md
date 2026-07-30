@@ -4,6 +4,7 @@
 
 ### Added
 
+- **`{qlstats}` placeholder**: for Quake Live statuses, renders as clickable ［📈］ linking to the server's qlstats.net page. Added to the default description template; opt-in for existing custom templates.
 - **`/statuscheck` command** (and `!statuscheck`): one-shot server query without persisting. Available to all users; slash reply is ephemeral.
 - **`!statusmoveup` / `!statusmovedown` commands** (slash and message): reorder a status within its channel. Adds a `position` column to the `statuses` table (schema v5, backfilled from id) and reposts every message in the affected channel sequentially in the new order so Discord's visual order matches DB position. Includes a 60s per-channel refresh lock preventing scheduler-driven updates from racing with the repost.
 - **`!statusrefresh` now reposts in position order**: previously reposted in parallel (arbitrary order); now sorts by `position` and reposts sequentially.
