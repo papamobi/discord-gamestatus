@@ -19,7 +19,7 @@ import {
 } from "../../tr1ckhouse";
 import { countryCode, codeToFlag } from "../../geoip";
 
-function serverFormat(str: string, server: State, flag: string = "") {
+function serverFormat(str: string, server: State, flag: string = "", qlstats: string = "") {
   for (const prop of <[keyof State]>FORMAT_PROPERTIES) {
     str = str.replace(
       new RegExp(`\\{${prop}\\}`, "gi"),
@@ -27,6 +27,7 @@ function serverFormat(str: string, server: State, flag: string = "") {
     );
   }
   str = str.replace(/\{flag\}/gi, flag);
+  str = str.replace(/\{qlstats\}/gi, qlstats);
   return str;
 }
 
@@ -87,17 +88,23 @@ export async function generateEmbed(
   const ipPort = (update as unknown as { ip?: string }).ip;
   const ipOnly = ipPort ? ipPort.split(":")[0] : null;
   const flag = ipOnly ? codeToFlag(await countryCode(ipOnly)) : "";
-
+  const gameType = (update as unknown as { type?: string }).type;
+  const qlstats =
+    gameType === "quakelive" && ipPort
+      ? `［[📈](https://qlstats.net/server/${ipPort})］`
+      : "";
   const embed = new MessageEmbed({
     title: serverFormat(
       update.getOption(OPT_TITLE[isOffline]) as string,
       server,
       flag,
+      qlstats,
     ),
     description: serverFormat(
       update.getOption(OPT_DESCRIPTION[isOffline]) as string,
       server,
       flag,
+      qlstats,
     ),
     color: update.getOption(OPT_COLOR[isOffline]) as number,
     timestamp: Date.now(),
