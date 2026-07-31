@@ -239,7 +239,7 @@ function parseOptionsFromCommandInteraction(
   }
 
   // Set
-  const value = opts.getString(KEYS.value, true);
+  const value = opts.getString(KEYS.value, true).replace(/\\n/g, "\n");
   if (command === options[3].name) {
     let parsed = value;
     try {
