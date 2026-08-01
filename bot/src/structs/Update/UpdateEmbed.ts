@@ -368,7 +368,6 @@ function renderGamedigPlayers(
     return Math.max(max, String(e.score).length);
   }, 1);
 
-  const headerLine = anyScore ? "**`SCR` · Player**\n" : "**Player**\n";
   const invisibleTitle = "\u200B";
 
   for (let i = 0; i < columns; i++) {
@@ -385,7 +384,7 @@ function renderGamedigPlayers(
         return hasScore ? `\`${score}\` · ${trimmed}` : trimmed;
       });
 
-      const content = (i === 0 ? headerLine : "") + lines.join("\n");
+      const content = lines.join("\n");
       embed.addField(invisibleTitle, content, true);
     }
   }
