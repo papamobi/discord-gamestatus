@@ -168,7 +168,6 @@ export async function generateEmbed(
   }, 1);
 
   // Header lives as a bold first line inside column 1's content.
-  const headerLine = anyScore ? "**`SCR` · Player**\n" : "**Player**\n";
   const invisibleTitle = "\u200B";
 
   for (let i = 0; i < columns; i++) {
@@ -185,7 +184,7 @@ export async function generateEmbed(
         return hasScore ? `\`${score}\` · ${trimmed}` : trimmed;
       });
 
-      const content = (i === 0 ? headerLine : "") + lines.join("\n");
+      const content = lines.join("\n");
       embed.addField(invisibleTitle, content, true);
     }
   }
