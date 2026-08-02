@@ -125,7 +125,9 @@ export async function generateEmbed(
         const name = stripGameColors(e.name);
         return name.length > nameLimit ? name.slice(0, nameLimit - 1) + "…" : name;
       });
-      const content = lines.join("\n");
+      
+	  const columnPrefix = i === 0 ? "**👥 Players**\n" : "\u200B\n";
+      const content = columnPrefix + lines.join("\n");
       embed.addField(invisibleTitle, content, true);
     }
   }
