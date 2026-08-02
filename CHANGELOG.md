@@ -4,6 +4,7 @@
 
 ### Added
 
+- **`👥 Players` header**: gamedig player list uses Discord field-name rendering for the header, giving consistent spacing on desktop and mobile.
 - **`\n` escape support in `/statusmod set`**: slash command values can include literal `\n` which becomes a real newline (workaround for Discord's single-line option fields).
 - **`{qlstats}` placeholder**: for Quake Live statuses, renders as clickable ［📈］ linking to the server's qlstats.net page. Added to the default description template; opt-in for existing custom templates.
 - **`/statuscheck` command** (and `!statuscheck`): one-shot server query without persisting. Available to all users; slash reply is ephemeral.
@@ -23,7 +24,8 @@
 
 ### Changed
 
-- **Player list rendering** rewritten: players sorted by score, monospace score column with figure-space padding (mobile-safe), Q3 color codes stripped, dynamic name-length scaling by column count, single bold header row.
+- **Removed score column from gamedig player list**: server-reported scores are unreliable across many protocols — QL Valve packets misattribute frags to spectators via slot-based reporting, and other games have similar quirks. Player names now sort alphabetically. Column widths bumped to 30/24/22 chars for 1/2/3 columns since the score column no longer takes space. Original score handling preserved on `feature/gamedig-scores` branch for future revival.
+- **Player list header** now uses Discord's field-name slot instead of prefixing content, eliminating column gaps on mobile.
 - **Default embed title** simplified from `{name} server status` to just `{name}`.
 - **Docker base images**: `node:22-alpine` (upstream was `node:18-alpine`, EOL April 2025) and `rust:1-alpine` for the scheduler.
 - **Help text**: improved `!statusmove` docs with usage examples; added fork GitHub link alongside upstream docs in `!help`.
