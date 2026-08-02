@@ -116,8 +116,7 @@ export async function generateEmbed(
 
   const columns = update.getOption("columns") as number;
   const rows = Math.ceil(enriched.length / columns);
-  const nameLimit = columns <= 1 ? 30 : columns === 2 ? 24 : 20;
-  const invisibleTitle = "\u200B";
+  const nameLimit = columns <= 1 ? 30 : columns === 2 ? 24 : 22;
   for (let i = 0; i < columns; i++) {
     const column = enriched.splice(0, rows);
     if (column.length > 0) {
@@ -125,10 +124,9 @@ export async function generateEmbed(
         const name = stripGameColors(e.name);
         return name.length > nameLimit ? name.slice(0, nameLimit - 1) + "…" : name;
       });
-      
-	  const columnPrefix = i === 0 ? "**👥 Players**\n" : "\u200B\n";
-      const content = columnPrefix + lines.join("\n");
-      embed.addField(invisibleTitle, content, true);
+      const fieldName = i === 0 ? "👥 Players" : "\u200B";
+      const content = lines.join("\n");
+      embed.addField(fieldName, content, true);
     }
   }
   return truncateEmbed(embed);
