@@ -1,0 +1,2 @@
+ALTER TABLE statuses ADD COLUMN show_players BOOLEAN DEFAULT TRUE;
+CREATE OR REPLACE VIEW schema_version AS SELECT 6 AS version;

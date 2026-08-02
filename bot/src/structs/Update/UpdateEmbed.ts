@@ -37,25 +37,13 @@ function serverFormat(str: string, server: State, flag: string = "", qlstats: st
 }
 const stripGameColors = (s: string) =>
   s
-    // Quake 3 / Quake Live / Doom 3 / Savage 2
-    // ^X + 6-hex (long form) or ^ + single char (short form)
     .replace(/\^(X.{6}|.)/g, "")
-    // Nadeo / Trackmania — $ + 3-hex or single letter
     .replace(/\$([0-9a-f]{3}|[a-z])/gi, "")
-    // Armagetron — 0xRRGGBB
     .replace(/0x[0-9a-f]{6}/g, "")
-    // Unreal 2 / Gamespy 2 (armygame) — escape codes and control chars
     .replace(/\x1b...|[\x00-\x1a]/g, "");
-// Figure space — a non-whitespace Unicode character that renders at the width
-// of a digit in monospace fonts. Used instead of regular spaces inside inline
-// code spans so Discord's mobile renderer doesn't trim them.
 const FIGURE_SPACE = "\u2007";
 const EMOJI_RED = process.env.TR1CKHOUSE_EMOJI_RED || "🟥";
 const EMOJI_BLUE = process.env.TR1CKHOUSE_EMOJI_BLUE || "🟦";
-// Extract clean name from a gamedig player object.
-//
-// OpenArena embeds a "<score> <ping> <name>" prefix in the name field;
-// strip that so we display just the actual player name.
 function extractPlayerName(p: Player): string {
   const r = (p.raw as Record<string, unknown>) ?? {};
   let name = p.name ?? "";
@@ -79,7 +67,6 @@ export async function generateEmbed(
   tick: number
 ): Promise<MessageEmbed> {
   const isOffline = server.offline ? 1 : 0;
-  // Look up country flag once for the whole embed
   const ipPort = (update as unknown as { ip?: string }).ip;
   const ipOnly = ipPort ? ipPort.split(":")[0] : null;
   const flag = ipOnly ? codeToFlag(await countryCode(ipOnly)) : "";
@@ -114,16 +101,17 @@ export async function generateEmbed(
   });
   const image = update.getOption(OPT_IMAGE[isOffline]) as string;
   if (image.length > 0) embed.setThumbnail(image);
-  const roster = ipPort ? await getRoster(ipPort) : null;
-  if (roster && !server.offline) {
-    renderTr1ckhouseRoster(embed, roster);
-    // Fold gametype into footer for tr1ckhouse servers so it doesn't eat
-    // a whole embed row.
-    embed.setFooter({
-      text: `${dots[tick % dots.length]}  •  Quake Live  •  ${gametypeLabel(roster)}`,
-    });
-  } else {
-    renderGamedigPlayers(embed, update, server);
+  const showPlayers = update.getOption("showPlayers") as boolean;
+  if (showPlayers) {
+    const roster = ipPort ? await getRoster(ipPort) : null;
+    if (roster && !server.offline) {
+      renderTr1ckhouseRoster(embed, roster);
+      embed.setFooter({
+        text: `${dots[tick % dots.length]}  •  Quake Live  •  ${gametypeLabel(roster)}`,
+      });
+    } else {
+      renderGamedigPlayers(embed, update, server);
+    }
   }
   return truncateEmbed(embed);
 }
@@ -138,19 +126,19 @@ interface LayoutConfig {
   sortBy: SortKey;
 }
 const GAMETYPE_LAYOUTS: Record<string, LayoutConfig> = {
-  "0":  { primary: "kd",    showDamage: true,  sortBy: "kills" }, // FFA
-  "1":  { primary: "kd",    showDamage: true,  sortBy: "kills" }, // Duel
-  "2":  { primary: "score", showDamage: false, sortBy: "score" }, // Race
-  "3":  { primary: "kd",    showDamage: true,  sortBy: "kills" }, // TDM
-  "4":  { primary: "kd",    showDamage: true,  sortBy: "kills" }, // Clan Arena
-  "5":  { primary: "kd",    showDamage: true,  sortBy: "kills" }, // CTF
-  "6":  { primary: "kd",    showDamage: true,  sortBy: "kills" }, // One Flag CTF
-  "7":  { primary: "kd",    showDamage: true,  sortBy: "kills" }, // Overload
-  "8":  { primary: "kd",    showDamage: true,  sortBy: "kills" }, // Harvester
-  "9":  { primary: "kd",    showDamage: true,  sortBy: "kills" }, // FreezeTag
-  "10": { primary: "kd",    showDamage: true,  sortBy: "kills" }, // Domination
-  "11": { primary: "kd",    showDamage: true,  sortBy: "kills" }, // A&D
-  "12": { primary: "kd",    showDamage: true,  sortBy: "kills" }, // Red Rover
+  "0":  { primary: "kd",    showDamage: true,  sortBy: "kills" },
+  "1":  { primary: "kd",    showDamage: true,  sortBy: "kills" },
+  "2":  { primary: "score", showDamage: false, sortBy: "score" },
+  "3":  { primary: "kd",    showDamage: true,  sortBy: "kills" },
+  "4":  { primary: "kd",    showDamage: true,  sortBy: "kills" },
+  "5":  { primary: "kd",    showDamage: true,  sortBy: "kills" },
+  "6":  { primary: "kd",    showDamage: true,  sortBy: "kills" },
+  "7":  { primary: "kd",    showDamage: true,  sortBy: "kills" },
+  "8":  { primary: "kd",    showDamage: true,  sortBy: "kills" },
+  "9":  { primary: "kd",    showDamage: true,  sortBy: "kills" },
+  "10": { primary: "kd",    showDamage: true,  sortBy: "kills" },
+  "11": { primary: "kd",    showDamage: true,  sortBy: "kills" },
+  "12": { primary: "kd",    showDamage: true,  sortBy: "kills" },
 };
 const DEFAULT_LAYOUT: LayoutConfig = {
   primary: "score",
@@ -177,7 +165,6 @@ const formatKd = (p: Tr1ckhousePlayer) => `${p.kills}/${p.deaths}`;
 const formatScore = (p: Tr1ckhousePlayer) => String(p.score);
 function resolveLayout(roster: Tr1ckhouseRoster): LayoutConfig {
   const base = GAMETYPE_LAYOUTS[roster.gametype] ?? DEFAULT_LAYOUT;
-  // Instagib: damage is meaningless (1 shot = 1 frag).
   if (roster.instagib) {
     return { ...base, showDamage: false };
   }
@@ -262,7 +249,6 @@ function formatTeam(
 ): string {
   if (players.length === 0) return "_empty_";
   const nameLimit = 14;
-  // Header row showing what the columns represent
   const headerParts: string[] = [];
   if (layout.primary === "kd") {
     headerParts.push("_k/d_");
@@ -309,8 +295,6 @@ function renderGamedigPlayers(
     player: p,
     name: extractPlayerName(p),
   }));
-  // Sort alphabetically since server-reported scores are unreliable
-  // (slot-based reporting misattributes frags to specs on some protocols).
   enriched.sort((a, b) => a.name.localeCompare(b.name));
   const columns = update.getOption("columns") as number;
   const rows = Math.ceil(enriched.length / columns);
