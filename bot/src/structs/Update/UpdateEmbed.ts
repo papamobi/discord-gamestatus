@@ -86,7 +86,7 @@ export async function generateEmbed(
   const gameType = (update as unknown as { type?: string }).type;
   const qlstats =
     gameType === "quakelive" && ipPort
-      ? `［[📈](https://qlstats.net/server/${ipPort})］`
+      ? `［[📈 stats](https://qlstats.net/server/${ipPort})］`
       : "";
   const embed = new MessageEmbed({
     title: serverFormat(
