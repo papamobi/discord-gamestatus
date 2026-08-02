@@ -33,5 +33,5 @@ USER node
 
 WORKDIR /home/node
 
-CMD ["--support", "https://discord.gg/CUefWnZ"]
+CMD ["--support", "https://discord.gg/VMySf6wtaS"]
 ENTRYPOINT [ "node", "--title", "discord-gamestatus", "/home/node/bin/discord-gamestatus.js", "--" ]
