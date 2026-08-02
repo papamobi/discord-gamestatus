@@ -105,28 +105,30 @@ export async function generateEmbed(
   const image = update.getOption(OPT_IMAGE[isOffline]) as string;
   if (image.length > 0) embed.setThumbnail(image);
 
-  const players = server.realPlayers === null ? [] : server.realPlayers;
-  const enriched = players.map((p) => ({
-    player: p,
-    name: extractPlayerName(p),
-  }));
-  // Sort alphabetically since server-reported scores are unreliable
-  // (slot-based reporting misattributes frags to specs on some protocols).
-  enriched.sort((a, b) => a.name.localeCompare(b.name));
-
-  const columns = update.getOption("columns") as number;
-  const rows = Math.ceil(enriched.length / columns);
-  const nameLimit = columns <= 1 ? 30 : columns === 2 ? 24 : 22;
-  for (let i = 0; i < columns; i++) {
-    const column = enriched.splice(0, rows);
-    if (column.length > 0) {
-      const lines = column.map((e) => {
-        const name = stripGameColors(e.name);
-        return name.length > nameLimit ? name.slice(0, nameLimit - 1) + "…" : name;
-      });
-      const fieldName = i === 0 ? "👥 Players" : "\u200B";
-      const content = lines.join("\n");
-      embed.addField(fieldName, content, true);
+  const showPlayers = update.getOption("showPlayers") as boolean;
+  if (showPlayers) {
+    const players = server.realPlayers === null ? [] : server.realPlayers;
+    const enriched = players.map((p) => ({
+      player: p,
+      name: extractPlayerName(p),
+    }));
+    // Sort alphabetically since server-reported scores are unreliable
+    // (slot-based reporting misattributes frags to specs on some protocols).
+    enriched.sort((a, b) => a.name.localeCompare(b.name));
+    const columns = update.getOption("columns") as number;
+    const rows = Math.ceil(enriched.length / columns);
+    const nameLimit = columns <= 1 ? 30 : columns === 2 ? 24 : 22;
+    for (let i = 0; i < columns; i++) {
+      const column = enriched.splice(0, rows);
+      if (column.length > 0) {
+        const lines = column.map((e) => {
+          const name = stripGameColors(e.name);
+          return name.length > nameLimit ? name.slice(0, nameLimit - 1) + "…" : name;
+        });
+        const fieldName = i === 0 ? "👥 Players" : "\u200B";
+        const content = lines.join("\n");
+        embed.addField(fieldName, content, true);
+      }
     }
   }
   return truncateEmbed(embed);

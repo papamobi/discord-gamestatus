@@ -39,6 +39,7 @@ export interface UpdateOptions {
   maxEdits?: number;
   connectUpdate?: boolean;
   disconnectUpdate?: boolean;
+  showPlayers?: boolean;
 }
 export type UpdateOption = keyof UpdateOptions;
 
@@ -58,4 +59,5 @@ export const DEFAULT_OPTIONS: UpdateOptions = {
   maxEdits: EditLimit(900000),
   connectUpdate: false,
   disconnectUpdate: false,
+  showPlayers: true,
 };
