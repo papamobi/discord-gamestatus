@@ -1,5 +1,13 @@
 # Fork changelog (papamobi)
 
+## 2026/08
+
+### Added
+
+- **`showPlayers` boolean option**: hide the player list for a compact status embed (just title, description, footer). Set via `/statusmod set <id> showPlayers false`. Schema v6.
+- **Value autocomplete for boolean settings** in `/statusmod set`: `connectUpdate`, `disconnectUpdate`, and `showPlayers` now suggest `true`/`false` when selected.
+- **Bumped to v2.4.3**.
+
 ## 2026/07
 
 ### Added
