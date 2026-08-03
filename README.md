@@ -39,6 +39,7 @@ differs from upstream in the following ways:
 - **Slash command registration fixed** for discord.js v13 (also submitted
   upstream as [PR #119](https://github.com/discord-gamestatus/discord-gamestatus/pull/119))
 - **`/status` game autocomplete**: slash command suggests matching games from gamedig's 321 supported protocols as you type.
+- **Autocomplete for boolean values** in `/statusmod set`.
 - **Country flag in embeds**: `{flag}` placeholder resolves to the server's country flag emoji via IP geolocation.
 - **Game name in embed footer**: standard embeds show the game name (e.g. "Team Fortress 2") next to the tick dot.
 - **Player list embed rewrite** in `UpdateEmbed.ts`: players sorted alphabetically, Q3 color codes stripped, dynamic name-length scaling by column count (30/24/22 chars for 1/2/3 columns), subtle "👥 Players" field-name header for consistent look on desktop and mobile.
@@ -47,6 +48,7 @@ differs from upstream in the following ways:
 - **`!statusmoveup` / `!statusmovedown`**: reorder statuses within a Discord channel. Adds a `position` column and reposts affected messages in order.
 - **`/statuscheck`**: one-shot server query, no status saved. Available to all users, ephemeral.
 - **`\n` escape support in `/statusmod set`**: type `\n` in slash-command values for line breaks (workaround for Discord's single-line option fields).
+- **Compact status style**: `showPlayers=false` hides the player list for high-density server-list channels.
 - **`{qlstats}` link for Quake Live statuses**: subtle ［📈］ link to qlstats.net/server/<ip:port>.
 - **Bot built locally** from this fork rather than pulling the upstream
   prebuilt image
