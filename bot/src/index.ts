@@ -240,17 +240,42 @@ async function onMessage(oMessage: Discord.Message) {
 }
 
 async function handleAutocomplete(interaction: Discord.AutocompleteInteraction) {
-  if (interaction.commandName !== "status" && interaction.commandName !== "statuscheck") return;
   const focused = interaction.options.getFocused(true);
-  if (focused.name !== "game") return;
 
-  const q = String(focused.value).toLowerCase();
-  const matches = GAMEDIG_GAME_IDS
-    .filter((id) => id.toLowerCase().includes(q))
-    .slice(0, 25)
-    .map((id) => ({ name: id, value: id }));
+  // /status and /statuscheck: game autocomplete
+  if (
+    (interaction.commandName === "status" ||
+      interaction.commandName === "statuscheck") &&
+    focused.name === "game"
+  ) {
+    const q = String(focused.value).toLowerCase();
+    const matches = GAMEDIG_GAME_IDS
+      .filter((id) => id.toLowerCase().includes(q))
+      .slice(0, 25)
+      .map((id) => ({ name: id, value: id }));
+    await interaction.respond(matches);
+    return;
+  }
 
-  await interaction.respond(matches);
+  // /statusmod set: value autocomplete for boolean settings
+  if (interaction.commandName === "statusmod" && focused.name === "value") {
+    const setting = interaction.options.getString("setting");
+    const booleanSettings = ["connectUpdate", "disconnectUpdate", "showPlayers"];
+    if (setting && booleanSettings.includes(setting)) {
+      const q = String(focused.value).toLowerCase();
+      const matches = ["true", "false"]
+        .filter((v) => v.includes(q))
+        .map((v) => ({ name: v, value: v }));
+      await interaction.respond(matches);
+      return;
+    }
+    // Non-boolean: echo user's input to suppress "no results" popup
+    const userValue = String(focused.value);
+    await interaction.respond([
+      { name: userValue || "Enter a value...", value: userValue || " " },
+    ]);
+    return;
+  }
 }
 async function onInteraction(interaction: Discord.Interaction) {
   if (interaction.isAutocomplete()) {

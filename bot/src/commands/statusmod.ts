@@ -146,6 +146,7 @@ export const options: ApplicationCommandOptionData[] = [
         name: KEYS.value,
         description: "New value of the setting",
         required: true,
+        autocomplete: true,
       },
     ],
   },
