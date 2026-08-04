@@ -38,6 +38,7 @@ differs from upstream in the following ways:
 
 - **Slash command registration fixed** for discord.js v13 (also submitted
   upstream as [PR #119](https://github.com/discord-gamestatus/discord-gamestatus/pull/119))
+- **Fixed `/gamelist` pagination**: slash command now shows all matching games across multiple embeds (was truncated to first embed only).
 - **`/status` game autocomplete**: slash command suggests matching games from gamedig's 321 supported protocols as you type.
 - **Autocomplete for boolean values** in `/statusmod set`.
 - **Country flag in embeds**: `{flag}` placeholder resolves to the server's country flag emoji via IP geolocation.
