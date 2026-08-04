@@ -4,6 +4,7 @@
 
 ### Added
 
+- **`--register-commands` flag**: self-hosters can now register/update slash commands via `docker-compose run --rm bot --register-commands` instead of finding and running `setup-commands.js` directly.
 - **Fixed `/gamelist` slash command**: previously only showed the first of three embeds; now paginates through all matching games via followUp messages. Also fixed the per-embed match counters that were undercounting.
 - **Auto-delete inactive statuses**: statuses continuously offline for 30+ days are automatically removed. A weekly sweeper marks offline servers, clears the mark when they come back online, and deletes both the DB row and Discord message once the threshold is reached. Posts a `⚫ Status for X was removed after 30 days offline` notification in the channel before deletion. Schema v7 adds `first_offline_at` timestamp.
 - **`showPlayers` boolean option**: hide the player list for a compact status embed (just title, description, footer). Set via `/statusmod set <id> showPlayers false`. Schema v6.
