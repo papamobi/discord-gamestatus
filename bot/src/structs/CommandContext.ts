@@ -44,6 +44,7 @@ export type OptionType = string;
 
 export interface CommandContext {
   reply: (options: ReplyOptions) => Promise<Message | void>;
+  followUp: (options: ReplyOptions) => Promise<unknown>;
   deferReply: (options: DeferReplyOptions) => Promise<void>;
   editReply: (options: ReplyOptions) => Promise<void>;
 
@@ -74,6 +75,9 @@ export class CommandInteractionContext implements CommandContext {
 
   reply(options: InteractionReplyOptions) {
     return this.data.reply(options);
+  }
+  followUp(options: InteractionReplyOptions) {
+    return this.data.followUp(options);
   }
 
   deferReply(options: DeferReplyOptions) {
@@ -165,6 +169,9 @@ export class MessageContext implements CommandContext {
 
   reply(options: ReplyMessageOptions) {
     return this.data.reply(options);
+  }
+  followUp(options: ReplyMessageOptions) {
+    return this.data.channel.send(options);
   }
 
   async deferReply(options: DeferReplyOptions) {

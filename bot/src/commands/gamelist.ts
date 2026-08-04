@@ -73,16 +73,16 @@ export async function call(context: CommandContext): Promise<void> {
         .map((v) => `\`${v}\``)
         .join(", ")}\n`;
       if (field.length + value.length > 1024) {
-        if (embedSize + field.length + 3 > 6000) {
+        embed.addField("_ _", field, false);
+        embedSize += field.length + 3;
+        field = "";
+        if (embedSize + 1024 > 6000) {
           embeds.push([embed, embedCount]);
           embedCount = 0;
           embed = new MessageEmbed({ color: EMBED_COLOR });
           embed.setFooter({ text: (++embedI).toString() });
           embedSize = 100;
         }
-        embed.addField("_ _", field, false);
-        embedSize += field.length + 3;
-        field = "";
       }
       field += value;
       count += 1;
@@ -91,11 +91,14 @@ export async function call(context: CommandContext): Promise<void> {
     key = gameIterator.next();
   }
   if (field.length > 0) embed.addField("_ _", field);
-  for (const [e, eCount] of embeds.concat([[embed, embedCount]])) {
+  const allEmbeds = embeds.concat([[embed, embedCount]]);
+  for (let i = 0; i < allEmbeds.length; i++) {
+    const [e, eCount] = allEmbeds[i];
     e.setTitle(`Matching games (${eCount}/${count})`);
-    await context.reply({ embeds: [e], ephemeral: true });
-    if (context instanceof CommandInteractionContext) {
-      break; // Command interactions can only have 1 reply
+    if (i === 0) {
+      await context.reply({ embeds: [e], ephemeral: true });
+    } else {
+      await context.followUp({ embeds: [e], ephemeral: true });
     }
   }
 }
