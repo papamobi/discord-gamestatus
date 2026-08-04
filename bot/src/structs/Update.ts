@@ -47,6 +47,7 @@ export interface UpdateConstructorOptions {
   ip: string;
   name?: string;
   position?: number;
+  firstOfflineAt?: Date | null;
   options?: UpdateOptions;
 }
 
@@ -76,6 +77,7 @@ export default class Update extends Serializable {
   public ip: string;
   public name: string;
   public position: number;
+  public firstOfflineAt: Date | null;
   public options: UpdateOptions = {};
 
   constructor(
@@ -97,6 +99,7 @@ export default class Update extends Serializable {
     this.ip = opts?.ip || "Error";
     this.name = opts?.name || "Error";
 	this.position = opts?.position ?? 0;
+    this.firstOfflineAt = opts?.firstOfflineAt ?? null;
     this.options = opts?.options || {};
 
     if (objs) {
@@ -245,8 +248,6 @@ export default class Update extends Serializable {
     if (guild === undefined || guild.deleted) return true;
     const channel = await this.getChannel(client);
     if (channel === undefined || channel.deleted) return true;
-    /* Permissions not checked here as the status will delete itself if it gets
-     *  lack of permission error code when updating */
     return false;
   }
 
@@ -383,6 +384,7 @@ export default class Update extends Serializable {
       offline: state.offline,
       map: state.map,
     });
+	console.log("DEBUG", this.ip, "type:", typeof this.firstOfflineAt, "value:", this.firstOfflineAt);
     if (!state.offline) this.name = state.name;
 
     const changes = stateChanges(this.state, prevState);

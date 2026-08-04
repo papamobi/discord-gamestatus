@@ -25,6 +25,7 @@ import Client, { ClientConfig } from "./structs/Client";
 import Message from "./structs/Message";
 import Update from "./structs/Update";
 import { isChannelRefreshing } from "./channelRefreshLock";
+import { startOfflineSweeper } from "./offlineSweeper";
 import {
   setDebugFlag,
   debugLog,
@@ -455,5 +456,6 @@ export default async function start(config: StartupConfig): Promise<Client> {
     startDBLApiHook(client, config.dblKey);
   }
   await client.login(config.key);
+  startOfflineSweeper(client);
   return client;
 }
