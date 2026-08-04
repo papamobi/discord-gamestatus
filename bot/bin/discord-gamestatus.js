@@ -250,7 +250,11 @@ if (require.main === module) {
   console.log(
     "This program is licensed under GPL-3.0 a license should be included in LICENSE or can be found at https://github.com/Douile/discord-gamestatus/blob/master/LICENSE"
   );
-  setupAndStart(process.env, process.argv);
+  if (process.argv.includes("--register-commands")) {
+    require("./setup-commands");
+  } else {
+    setupAndStart(process.env, process.argv);
+  }
 }
 
 module.exports = {
