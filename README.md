@@ -8,6 +8,7 @@ current status.
 - [Self-hosting documentation (WIP)](https://gamestatus.douile.com/docs/admin)
 - [Terms of usage (for public bot)](https://tr1ckhouse.net/gamestatus/terms.html)
 - [Privacy policy (for public bot)](https://tr1ckhouse.net/gamestatus/privacy.html)
+[![Discord Bots](https://top.gg/api/widget/1278673992634470463.svg)](https://top.gg/bot/1278673992634470463)
 
 ## Quick Start
 
