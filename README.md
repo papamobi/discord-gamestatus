@@ -56,6 +56,7 @@ differs from upstream in the following ways:
   reproducible builds
 - **Updated base images**: `node:22-alpine` (upstream was `node:18-alpine`,
   EOL April 2025) and `rust:1-alpine` for the scheduler
+- **Auto-cleanup of dead statuses**: any status offline continuously for 30 days is removed automatically (with a notification message posted in the channel first).
 
 ### Tr1ckHouse roster integration
 
