@@ -32,12 +32,12 @@
   },
   "license": "GPL-3.0",
   "bugs": {
-    "url": "https://github.com/Douile/discord-gamestatus/issues"
+    "url": "https://github.com/papamobi/discord-gamestatus/issues"
   },
-  "homepage": "https://github.com/Douile/discord-gamestatus",
+  "homepage": "https://github.com/papamobi/discord-gamestatus",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Douile/discord-gamestatus.git"
+    "url": "https://github.com/papamobi/discord-gamestatus.git"
   },
   "engines": {
     "node": ">=17.0.0"
