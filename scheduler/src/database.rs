@@ -53,7 +53,7 @@ pub fn row_to_json_value(row: &tokio_postgres::Row) -> HashMap<&str, serde_json:
                 PGType::VARCHAR => row_get_or_null::<String>(row, idx),
                 PGType::JSONB => row_get_or_null::<JValue>(row, idx),
                 PGType::BOOL => row_get_or_null::<bool>(row, idx),
-                // TODO: Add parsing for dots array
+                PGType::TEXT_ARRAY | PGType::VARCHAR_ARRAY => row_get_or_null::<Vec<String>>(row, idx),
                 _ => JValue::Null,
             },
         );
