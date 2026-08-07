@@ -162,7 +162,16 @@ const GAMETYPE_NAMES: Record<string, string> = {
 };
 const formatDamage = (dmg: number) => `${(dmg / 1000).toFixed(1)}k`;
 const formatKd = (p: Tr1ckhousePlayer) => `${p.kills}/${p.deaths}`;
-const formatScore = (p: Tr1ckhousePlayer) => String(p.score);
+const formatScore = (p: Tr1ckhousePlayer): string => {
+  // Race mode: score is milliseconds; INT32_MAX = no valid time yet
+  if (p.score >= 2147483647 || p.score < 0) return "—";
+  if (p.score === 0) return "—";
+  // Format as m:ss.mmm (race time)
+  const min = Math.floor(p.score / 60000);
+  const sec = Math.floor((p.score % 60000) / 1000);
+  const ms = p.score % 1000;
+  return `${min}:${sec.toString().padStart(2, "0")}.${ms.toString().padStart(3, "0")}`;
+};
 function resolveLayout(roster: Tr1ckhouseRoster): LayoutConfig {
   const base = GAMETYPE_LAYOUTS[roster.gametype] ?? DEFAULT_LAYOUT;
   if (roster.instagib) {
@@ -253,13 +262,13 @@ function formatTeam(
   if (layout.primary === "kd") {
     headerParts.push("_k/d_");
   } else {
-    headerParts.push("_scr_");
+    headerParts.push("_time_");
   }
   headerParts.push("_player_");
   if (layout.showDamage) {
     headerParts.push("_dmg_");
   }
-  const header = "-# " + headerParts.join("\u2007·\u2007");
+  const header = "-# " + headerParts.join("\u2007\u2007·\u2007\u2007");
   const rows = players
     .map((p) => {
       const name = stripGameColors(p.name);
@@ -277,7 +286,7 @@ function formatTeam(
       if (layout.showDamage) {
         parts.push(`\`${formatDamage(p.damage).padStart(widths.dmg, FIGURE_SPACE)}\``);
       }
-      return parts.join("\u2007");
+      return parts.join("\u2007\u2007");
     })
     .join("\n");
   return `${header}\n${rows}`;
