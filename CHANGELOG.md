@@ -4,6 +4,9 @@
 
 ### Added
 
+- **Configurable spectator team emoji** (tr1ckhouse branch): new `TR1CKHOUSE_EMOJI_SPEC` env var, same guild-scoped custom emoji pattern as RED/BLUE. Defaults to ⬜.
+- **Race mode times** (tr1ckhouse branch): race score now renders as `m:ss.mmm` instead of raw milliseconds; players with no time show as "—". Header label changes from `_scr_` to `_time_` in race mode.
+- **Wider tr1ckhouse enriched embed spacing**: doubled figure-space separators around column headers and between row columns for better readability at wider terminals.
 - **Custom dots now work again**: Rust scheduler was dropping the `text[]` array columns, leaving dots as null on every push. Now handles `text[]` and `varchar[]` so custom dots set via `/statusmod set <id> dots ...` render properly.
 - **`--register-commands` flag**: self-hosters can now register/update slash commands via `docker-compose run --rm bot --register-commands` instead of finding and running `setup-commands.js` directly.
 - **Fixed `/gamelist` slash command**: previously only showed the first of three embeds; now paginates through all matching games via followUp messages. Also fixed the per-embed match counters that were undercounting.
@@ -11,7 +14,6 @@
 - **`showPlayers` boolean option**: hide the player list for a compact status embed (just title, description, footer). Set via `/statusmod set <id> showPlayers false`. Schema v6.
 - **Value autocomplete for boolean settings** in `/statusmod set`: `connectUpdate`, `disconnectUpdate`, and `showPlayers` now suggest `true`/`false` when selected.
 - **Bumped to v2.4.3**.
-
 
 ## 2026/07
 
