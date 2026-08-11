@@ -44,6 +44,7 @@ const stripGameColors = (s: string) =>
 const FIGURE_SPACE = "\u2007";
 const EMOJI_RED = process.env.TR1CKHOUSE_EMOJI_RED || "🟥";
 const EMOJI_BLUE = process.env.TR1CKHOUSE_EMOJI_BLUE || "🟦";
+const EMOJI_SPEC = process.env.TR1CKHOUSE_EMOJI_SPEC || "⬜";
 function extractPlayerName(p: Player): string {
   const r = (p.raw as Record<string, unknown>) ?? {};
   let name = p.name ?? "";
@@ -225,7 +226,7 @@ function renderTr1ckhouseRoster(
       .map((p) => stripGameColors(p.name))
       .join(", ");
     embed.addField(
-      `Spectators (${roster.teams.spectator.length})`,
+      `${EMOJI_SPEC} Spectators (${roster.teams.spectator.length})`,
       names,
       false
     );
