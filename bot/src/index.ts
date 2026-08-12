@@ -427,7 +427,7 @@ export default async function start(config: StartupConfig): Promise<Client> {
         activities: [
           {
             type: "WATCHING",
-            name: `game servers 🎮| /status or ${client.config.prefix}help`,
+            name: `game servers 🎮|  /status or ${client.config.prefix}help`,
           },
         ],
       });
