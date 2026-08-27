@@ -278,9 +278,34 @@ async function handleAutocomplete(interaction: Discord.AutocompleteInteraction) 
     return;
   }
 }
+
+async function handleButton(interaction: Discord.ButtonInteraction) {
+  if (!interaction.customId.startsWith("status-info:")) return;
+  const parts = interaction.customId.split(":");
+  const guildId = parts[1];
+  const channelId = parts[2];
+  const ip = parts.slice(3).join(":");
+  const client = interaction.client as Client;
+  const statuses = await client.updateCache.get({ guild: guildId, channel: channelId });
+  const status = statuses.find((s) => s.ip === ip);
+  if (!status) {
+    await interaction.reply({ content: "Status not found.", ephemeral: true });
+    return;
+  }
+  const content = status.getOption("buttonContent");
+  if (!content || typeof content !== "string" || content.trim().length === 0) {
+    await interaction.reply({ content: "No additional info configured.", ephemeral: true });
+    return;
+  }
+  await interaction.reply({ content: String(content), ephemeral: true });
+}
+
 async function onInteraction(interaction: Discord.Interaction) {
   if (interaction.isAutocomplete()) {
     return handleAutocomplete(interaction);
+  }
+  if (interaction.isButton()) {
+    return handleButton(interaction);
   }
   if (!interaction.isCommand()) return;
 

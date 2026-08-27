@@ -59,7 +59,7 @@ export default class SavePSQL implements SaveInterface {
     // Should be fine for now as key can only be one of the 3 above values
     // but if there is some kind of other injection this would be exploitable
     const query = await client.query(
-      `SELECT guild_id, channel_id, message_id, type, ip, name, state, dots, title, offline_title, description, offline_description, color, offline_color, image, offline_image, columns, max_edits, connect_update, disconnect_update, show_players, first_offline_at, position FROM statuses WHERE ${key}=$1 ORDER BY position, id`,
+      `SELECT guild_id, channel_id, message_id, type, ip, name, state, dots, title, offline_title, description, offline_description, color, offline_color, image, offline_image, columns, max_edits, connect_update, disconnect_update, show_players, button_label, button_content, first_offline_at, position FROM statuses WHERE ${key}=$1 ORDER BY position, id`,
       [value]
     );
     client.release();
@@ -73,8 +73,8 @@ export default class SavePSQL implements SaveInterface {
       await client.query(
         "INSERT INTO statuses \
           (guild_id, channel_id, message_id, type, ip, name, state, dots, title, offline_title, description, offline_description,\
-          color, offline_color, image, offline_image, columns, max_edits, connect_update, disconnect_update, show_players, first_offline_at, position) VALUES \
-          ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, \
+          color, offline_color, image, offline_image, columns, max_edits, connect_update, disconnect_update, show_players, button_label, button_content, first_offline_at, position) VALUES \
+          ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, \
           (SELECT COALESCE(MAX(position), 0) + 1 FROM statuses WHERE channel_id = $2::varchar(128)))",
         [
           status.guild,
@@ -98,6 +98,8 @@ export default class SavePSQL implements SaveInterface {
           status.options?.connectUpdate,
           status.options?.disconnectUpdate,
           status.options?.showPlayers,
+		  status.options?.buttonLabel,
+		  status.options?.buttonContent,
 		  status.firstOfflineAt,
         ]
       );
@@ -119,7 +121,7 @@ export default class SavePSQL implements SaveInterface {
       const r = await client.query(
         "UPDATE statuses SET\
           channel_id=$2, message_id=$4, type=$5, name=$6, state=$7, dots=$8, title=$9, offline_title=$10, description=$11, offline_description=$12,\
-          color=$13, offline_color=$14, image=$15, offline_image=$16, columns=$17, max_edits=$18, connect_update=$19, disconnect_update=$20, show_players=$21, first_offline_at=$22, position=$23\
+          color=$13, offline_color=$14, image=$15, offline_image=$16, columns=$17, max_edits=$18, connect_update=$19, disconnect_update=$20, show_players=$21, button_label=$22, button_content=$23, first_offline_at=$24, position=$25\
           WHERE guild_id=$1 AND ip=$3",
         [
           status.guild,
@@ -143,6 +145,8 @@ export default class SavePSQL implements SaveInterface {
           status.options?.connectUpdate,
           status.options?.disconnectUpdate,
 		  status.options?.showPlayers,
+		  status.options?.buttonLabel,
+		  status.options?.buttonContent,
 		  status.firstOfflineAt,
           status.position ?? 0,
         ]
@@ -278,7 +282,7 @@ export default class SavePSQL implements SaveInterface {
   async getAll(): Promise<{ [id: string]: Update[] }> {
     const client = await this.pool.connect();
     const query = await client.query(
-      "SELECT guild_id, channel_id, message_id, type, ip, name, state, dots, title, offline_title, description, offline_description, color, offline_color, image, offline_image, columns, max_edits, connect_update, disconnect_update, show_players, first_offline_at, position FROM statuses ORDER BY position, id"
+      "SELECT guild_id, channel_id, message_id, type, ip, name, state, dots, title, offline_title, description, offline_description, color, offline_color, image, offline_image, columns, max_edits, connect_update, disconnect_update, show_players, button_label, button_content, first_offline_at, position FROM statuses ORDER BY position, id"
     );
     client.release();
     const res: { [id: string]: Update[] } = {};
@@ -318,6 +322,8 @@ export default class SavePSQL implements SaveInterface {
         connectUpdate: row.connect_update,
         disconnectUpdate: row.disconnect_update,
 		showPlayers: row.show_players,
+		buttonLabel:row.button_label,
+		buttonContent:row.button_content,
       },
     }) as Update;
   }

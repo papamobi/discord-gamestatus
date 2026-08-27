@@ -19,6 +19,9 @@ import {
   Snowflake,
   TextChannel,
   Message,
+  MessageActionRow,
+  MessageButton,
+  MessageEmbed,
   DiscordAPIError,
 } from "discord.js-light";
 import { Guild } from "discord.js";
@@ -416,10 +419,25 @@ export default class Update extends Serializable {
     if (this.getOption("disconnectUpdate"))
       changesToSend = changesToSend.concat(changes.players.disconnect);
 
-    const messageData = {
+    const messageData: {
+      content: string;
+      embeds: MessageEmbed[];
+      components?: MessageActionRow[];
+    } = {
       content: "_ _",
       embeds: [embed],
     };
+    // Add button if configured
+    const buttonLabel = this.getOption("buttonLabel");
+    if (buttonLabel && typeof buttonLabel === "string" && buttonLabel.trim().length > 0) {
+      const row = new MessageActionRow().addComponents(
+        new MessageButton()
+          .setCustomId(`status-info:${this.guild}:${this.channel}:${this.ip}`)
+          .setLabel(buttonLabel)
+          .setStyle("SECONDARY")
+      );
+      messageData.components = [row];
+    }
     if (changesToSend.length > 0) {
       const changeString = changesToSend
         .map((v) => v.msg)

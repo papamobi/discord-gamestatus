@@ -40,6 +40,8 @@ export interface UpdateOptions {
   connectUpdate?: boolean;
   disconnectUpdate?: boolean;
   showPlayers?: boolean;
+  buttonLabel?: string;
+  buttonContent?: string;
 }
 export type UpdateOption = keyof UpdateOptions;
 
@@ -60,4 +62,6 @@ export const DEFAULT_OPTIONS: UpdateOptions = {
   connectUpdate: false,
   disconnectUpdate: false,
   showPlayers: true,
+  buttonLabel: "",
+  buttonContent: "",
 };
