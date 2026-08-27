@@ -50,6 +50,8 @@ const OPTION_LAYOUT: readonly (keyof UpdateOptions | "spacer")[] =
     "connectUpdate",
     "disconnectUpdate",
 	"showPlayers",
+	"buttonLabel",
+	"buttonContent",
     "spacer",
     "columns",
     "maxEdits",
