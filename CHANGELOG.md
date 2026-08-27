@@ -4,6 +4,7 @@
 
 ### Added
 
+- **Per-status ephemeral info button**: new `buttonLabel` and `buttonContent` options let each status show a grey button below its embed. Clicking sends the configured content as an ephemeral message (only the clicker sees it). Useful for proxy servers, connection instructions, or any per-status info that would clutter the description. Configure via `/statusmod set <id> buttonLabel "..."` and `/statusmod set <id> buttonContent "..."`. Schema v8.
 - **Custom dots now work again**: Rust scheduler was dropping the `text[]` array columns, leaving dots as null on every push. Now handles `text[]` and `varchar[]` so custom dots set via `/statusmod set <id> dots ...` render properly.
 - **`--register-commands` flag**: self-hosters can now register/update slash commands via `docker-compose run --rm bot --register-commands` instead of finding and running `setup-commands.js` directly.
 - **Fixed `/gamelist` slash command**: previously only showed the first of three embeds; now paginates through all matching games via followUp messages. Also fixed the per-embed match counters that were undercounting.
@@ -11,7 +12,6 @@
 - **`showPlayers` boolean option**: hide the player list for a compact status embed (just title, description, footer). Set via `/statusmod set <id> showPlayers false`. Schema v6.
 - **Value autocomplete for boolean settings** in `/statusmod set`: `connectUpdate`, `disconnectUpdate`, and `showPlayers` now suggest `true`/`false` when selected.
 - **Bumped to v2.4.3**.
-
 
 ## 2026/07
 
