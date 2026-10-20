@@ -36,7 +36,7 @@ services:
       GS_QUERY_TIMEOUT: "${GS_QUERY_TIMEOUT}"
       CONNECT_REDIRECT_URL: "${CONNECT_REDIRECT_URL:-}"
     env_file: .env
-    restart: on-failure
+    restart: unless-stopped
     command: [ "--debug", "--verbose" ]
   scheduler:
     #image: "gamestatus/gamestatus-scheduler"
@@ -54,5 +54,5 @@ services:
       GS_TICK_COUNT: "${GS_TICK_COUNT}"
       GS_TICK_TIME: "${GS_TICK_TIME}"
     env_file: .env
-    restart: on-failure
+    restart: unless-stopped
 
