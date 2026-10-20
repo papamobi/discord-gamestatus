@@ -52,7 +52,7 @@ export const DEFAULT_OPTIONS: UpdateOptions = {
   description: DescriptionLimit(
   "Playing **{map}** with **{numplayers}**/**{maxplayers}** players {qlstats}\nConnect with {connect} {flag}"
 ),
-  offlineDescription: DescriptionLimit("Server is offline"),
+  offlineDescription: DescriptionLimit("Server is offline\n-# IP: `{connect}`"),
   color: ColorLimit(0x2894c2),
   offlineColor: ColorLimit(0xff0000),
   image: ImageLimit(""),
