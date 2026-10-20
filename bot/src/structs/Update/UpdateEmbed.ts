@@ -216,7 +216,7 @@ function renderTr1ckhouseRoster(
     const players = sortPlayers(roster.teams.free, layout);
     const widths = computeColumnWidths(players, layout);
     embed.addField(
-      `Players (${players.length})`,
+      `👥 Players (${players.length})`,
       formatTeam(players, layout, widths),
       false
     );
@@ -258,17 +258,11 @@ function formatTeam(
   widths: ColumnWidths
 ): string {
   if (players.length === 0) return "_empty_";
-  const nameLimit = 14;
+  const nameLimit = 16;
   const headerParts: string[] = [];
-  if (layout.primary === "kd") {
-    headerParts.push("_k/d_");
-  } else {
-    headerParts.push("_time_");
-  }
+  headerParts.push(layout.primary === "kd" ? "_k/d_" : "_time_");
+  if (layout.showDamage) headerParts.push("_dmg_");
   headerParts.push("_player_");
-  if (layout.showDamage) {
-    headerParts.push("_dmg_");
-  }
   const header = "-# " + headerParts.join("\u2007\u2007·\u2007\u2007");
   const rows = players
     .map((p) => {
@@ -276,17 +270,15 @@ function formatTeam(
       const trimmed =
         name.length > nameLimit ? name.slice(0, nameLimit - 1) + "…" : name;
       const parts: string[] = [];
-      if (layout.primary === "kd") {
-        const kd = formatKd(p).padStart(widths.primary, FIGURE_SPACE);
-        parts.push(`\`${kd}\``);
-      } else {
-        const score = formatScore(p).padStart(widths.primary, FIGURE_SPACE);
-        parts.push(`\`${score}\``);
+      const primary =
+        layout.primary === "kd" ? formatKd(p) : formatScore(p);
+      parts.push(`\`${primary.padStart(widths.primary, FIGURE_SPACE)}\``);
+      if (layout.showDamage) {
+        parts.push(
+          `\`${formatDamage(p.damage).padStart(widths.dmg, FIGURE_SPACE)}\``
+        );
       }
       parts.push(trimmed);
-      if (layout.showDamage) {
-        parts.push(`\`${formatDamage(p.damage).padStart(widths.dmg, FIGURE_SPACE)}\``);
-      }
       return parts.join("\u2007\u2007");
     })
     .join("\n");
