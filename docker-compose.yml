@@ -2,6 +2,7 @@ version: "3"
 services:
   postgres:
     image: "postgres:15"
+    restart: unless-stopped
     volumes:
       - "./.db-data/:/var/lib/postgresql/data"
       - "./bot/scripts/schemas/:/docker-entrypoint-initdb.d"
