@@ -4,6 +4,8 @@
 
 ### Changed
 
+- **Steam connect links limited to supported games**: the `CONNECT_REDIRECT_URL` link is now only applied to GoldSrc/Source games and Quake Live. Other Steam-protocol games (Arma 3, DayZ, Valheim, etc.) failed in Steam with "app id specified by server is invalid" and now show a plain IP instead.
+
 - **IP shown under offline embed description**: offline statuses now display their IP as a small subscript line (`-# IP: {connect}`) below "Server is offline" for easier identification. Statuses with a custom `offlineDescription` keep their value.
 - **Container restart policy**: bot and scheduler now use `restart: unless-stopped`, so they come back up after a host reboot (previously `on-failure`, which only restarted after crashes).
 
