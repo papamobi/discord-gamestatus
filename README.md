@@ -90,7 +90,7 @@ Three ways to use it:
 ### Env vars added by this fork
 
 - `CONNECT_REDIRECT_URL` — optional HTTPS URL wrapped around the `{connect}`
-  embed placeholder on Steam/Valve-protocol servers. Discord no longer
+  embed placeholder on supported Steam games (GoldSrc/Source titles and Quake Live). Discord no longer
   renders `steam://` schemes as clickable in embeds, so those links have
   been effectively dead. The bot appends `?ip=<ip>&port=<port>` to this
   URL and renders `{connect}` as a clickable `[ip:port](url)` link. The
