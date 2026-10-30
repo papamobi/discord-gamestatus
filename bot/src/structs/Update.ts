@@ -387,7 +387,6 @@ export default class Update extends Serializable {
       offline: state.offline,
       map: state.map,
     });
-	console.log("DEBUG", this.ip, "type:", typeof this.firstOfflineAt, "value:", this.firstOfflineAt);
     if (!state.offline) this.name = state.name;
 
     const changes = stateChanges(this.state, prevState);
