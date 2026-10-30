@@ -117,9 +117,31 @@ export function shouldBlock(address: Address): boolean {
   return getLocalBlocklist().check(address.ip, address.family);
 }
 
-const parseConnect = function (connect: string, protocol: string) {
+/*
+ * Games where steam://connect/ip:port works: GoldSrc/Source titles (plus
+ * Quake Live, which is Steamworks-based), which
+ * accept the engine +connect argument and answer Steam's query on the game
+ * port. Other Steam games (Arma 3, Rust, ...) fail with "app id specified by
+ * server is invalid", so they get a plain IP instead.
+ */
+const STEAM_CONNECT_GAMES = new Set([
+  // GoldSrc
+  "cs16", "cscz", "hldm", "hlopfor", "tfc", "dod", "dmc", "ricochet",
+  "svencoop", "gunmanchronicles",
+  // Source
+  "css", "csgo", "cs2", "hl2dm", "hldms", "tf2", "dods", "garrysmod",
+  "left4dead", "left4dead2", "insurgency", "nmrih", "doi",
+  "blackmesa", "synergy", "fof", "zps", "nucleardawn", "pvkii",
+  "ageofchivalry", "contagion", "brainbread2", "alienswarm",
+  "codenamecure", "dab", "dys", "em", "fortressforever", "ship",
+  "dmomam", "dinodday", "bs",
+  // Other Steam games where steam://connect works
+  "quakelive",
+]);
+
+const parseConnect = function (connect: string, gameType: string) {
   const redirectUrl = process.env.CONNECT_REDIRECT_URL;
-  if (redirectUrl && protocol === "valve") {
+  if (redirectUrl && STEAM_CONNECT_GAMES.has(gameType)) {
     const [ip, port] = connect.split(":");
     const url = port
       ? `${redirectUrl}?ip=${ip}&port=${port}`
@@ -200,7 +222,7 @@ export async function query(
       ...rawState,
     };
     state.players = Array.from(state.players || []);
-    state.connect = parseConnect(state.connect, protocol);
+    state.connect = parseConnect(state.connect, queryType);
     state.map = parseMap(state.map, protocol);
   } catch (e) {
     verboseLog(
