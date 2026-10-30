@@ -9,6 +9,8 @@
 - **IP shown under offline embed description**: offline statuses now display their IP as a small subscript line (`-# IP: {connect}`) below "Server is offline" for easier identification. Statuses with a custom `offlineDescription` keep their value.
 - **Container restart policy**: bot and scheduler now use `restart: unless-stopped`, so they come back up after a host reboot (previously `on-failure`, which only restarted after crashes).
 
+- **Bumped to v2.5.0**: pg 8.23.1, @types/pg, @types/ws; `npm audit fix` for transitive advisories (undici, brace-expansion, js-yaml).
+
 ## 2026/08
 
 ### Added
