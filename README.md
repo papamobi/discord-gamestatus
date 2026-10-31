@@ -106,7 +106,7 @@ Three ways to use it:
 
 The `tr1ckhouse` branch adds a few more env vars for QL-specific features
 (`TR1CKHOUSE_ROSTER_API_URL`, `TR1CKHOUSE_ROSTER_API_KEY`,
-`TR1CKHOUSE_EMOJI_RED`, `TR1CKHOUSE_EMOJI_BLUE`) — see `.env.example`.
+`TR1CKHOUSE_EMOJI_RED`, `TR1CKHOUSE_EMOJI_BLUE`, `TR1CKHOUSE_EMOJI_SPEC`) — see `.env.example`.
 
 Upstream `master` is at https://github.com/discord-gamestatus/discord-gamestatus.
 
