@@ -11,6 +11,8 @@
 
 - **Bumped to v2.5.0**: pg 8.23.1, @types/pg, @types/ws; `npm audit fix` for transitive advisories (undici, brace-expansion, js-yaml).
 
+- **Plain connect addresses as inline code**: games without a Steam connect link now show `ip:port` as a monospace chip so it stands out in the description and is easy to copy.
+
 ## 2026/08
 
 ### Added
