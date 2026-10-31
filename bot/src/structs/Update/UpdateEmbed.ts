@@ -45,6 +45,8 @@ const FIGURE_SPACE = "\u2007";
 const EMOJI_RED = process.env.TR1CKHOUSE_EMOJI_RED || "🟥";
 const EMOJI_BLUE = process.env.TR1CKHOUSE_EMOJI_BLUE || "🟦";
 const EMOJI_SPEC = process.env.TR1CKHOUSE_EMOJI_SPEC || "⬜";
+const MAPSHOT_URL = process.env.TR1CKHOUSE_MAPSHOT_URL || "";
+const MAPSHOT_GAMES = new Set(["quakelive", "quake3"]);
 function extractPlayerName(p: Player): string {
   const r = (p.raw as Record<string, unknown>) ?? {};
   let name = p.name ?? "";
@@ -101,7 +103,15 @@ export async function generateEmbed(
       : dots[tick % dots.length],
   });
   const image = update.getOption(OPT_IMAGE[isOffline]) as string;
-  if (image.length > 0) embed.setThumbnail(image);
+  if (image.length > 0) {
+    embed.setThumbnail(image);
+  } else if (MAPSHOT_URL && gameType && MAPSHOT_GAMES.has(gameType)) {
+    embed.setThumbnail(
+      isOffline
+        ? `${MAPSHOT_URL}?offline=1&v=5`
+        : `${MAPSHOT_URL}?map=${encodeURIComponent(server.map)}&v=5`
+    );
+  }
   const showPlayers = update.getOption("showPlayers") as boolean;
   if (showPlayers) {
     const roster = ipPort ? await getRoster(ipPort) : null;
