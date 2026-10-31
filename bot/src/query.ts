@@ -148,7 +148,7 @@ const parseConnect = function (connect: string, gameType: string) {
       : `${redirectUrl}?ip=${ip}`;
     return `[${connect}](${url})`;
   }
-  return connect;
+  return `\`${connect}\``;
 };
 
 const parseMap = function (map: string, protocol: string) {
