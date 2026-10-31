@@ -11,7 +11,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 import { MessageEmbed } from "discord.js-light";
-import { truncateEmbed } from "@douile/bot-utilities";
+import { truncateEmbed, markdownEscape } from "@douile/bot-utilities";
 import { Player } from "gamedig";
 import { GAMEDIG_GAME_NAMES } from "../../gamedigNames";
 import Update from "../Update";
@@ -223,7 +223,7 @@ function renderTr1ckhouseRoster(
   }
   if (roster.teams.spectator.length > 0) {
     const names = roster.teams.spectator
-      .map((p) => stripGameColors(p.name))
+      .map((p) => markdownEscape(stripGameColors(p.name)))
       .join(", ");
     embed.addField(
       `${EMOJI_SPEC} Spectators (${roster.teams.spectator.length})`,
@@ -278,7 +278,7 @@ function formatTeam(
           `\`${formatDamage(p.damage).padStart(widths.dmg, FIGURE_SPACE)}\``
         );
       }
-      parts.push(trimmed);
+      parts.push(markdownEscape(trimmed));
       return parts.join("\u2007\u2007");
     })
     .join("\n");
