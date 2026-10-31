@@ -13,6 +13,8 @@
 
 - **Plain connect addresses as inline code**: games without a Steam connect link now show `ip:port` as a monospace chip so it stands out in the description and is easy to copy.
 
+- **Map thumbnails** (tr1ckhouse branch): Quake Live and Quake 3 statuses without a custom image show the current map (placeholder for unknown maps, darkened when offline). Configure with `TR1CKHOUSE_MAPSHOT_URL`.
+
 ## 2026/08
 
 ### Added
