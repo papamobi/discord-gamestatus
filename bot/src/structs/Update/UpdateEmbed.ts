@@ -108,8 +108,8 @@ export async function generateEmbed(
   } else if (MAPSHOT_URL && gameType && MAPSHOT_GAMES.has(gameType)) {
     embed.setThumbnail(
       isOffline
-        ? `${MAPSHOT_URL}?offline=1&v=5`
-        : `${MAPSHOT_URL}?map=${encodeURIComponent(server.map)}&v=5`
+        ? `${MAPSHOT_URL}?offline=1&v=7`
+        : `${MAPSHOT_URL}?map=${encodeURIComponent(server.map)}&v=7`
     );
   }
   const showPlayers = update.getOption("showPlayers") as boolean;
