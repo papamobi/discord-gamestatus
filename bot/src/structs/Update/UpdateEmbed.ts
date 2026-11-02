@@ -115,15 +115,22 @@ export async function generateEmbed(
     // Sort alphabetically since server-reported scores are unreliable
     // (slot-based reporting misattributes frags to specs on some protocols).
     enriched.sort((a, b) => a.name.localeCompare(b.name));
-    const columns = update.getOption("columns") as number;
+    // Adaptive columns unless the status explicitly sets one.
+    const userColumns = update.options?.columns;
+    const count = enriched.length;
+    const columns =
+      userColumns != null
+        ? userColumns
+        : count <= 5 ? 1 : count <= 14 ? 2 : 3;
     const rows = Math.ceil(enriched.length / columns);
     const nameLimit = columns <= 1 ? 30 : columns === 2 ? 24 : 22;
     for (let i = 0; i < columns; i++) {
       const column = enriched.splice(0, rows);
       if (column.length > 0) {
-        const lines = column.map((e) => {
-          const name = stripGameColors(e.name);
-          return name.length > nameLimit ? name.slice(0, nameLimit - 1) + "…" : name;
+    const lines = column.map((e) => {
+    const name = stripGameColors(e.name);
+    const shown = name.length > nameLimit ? name.slice(0, nameLimit - 1) + "…" : name;
+          return shown;
         });
         const fieldName = i === 0 ? "👥 Players" : "\u200B";
         const content = lines.join("\n");
