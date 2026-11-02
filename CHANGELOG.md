@@ -1,5 +1,11 @@
 # Fork changelog (papamobi)
 
+## 2026/11
+
+### Changed
+
+- **Adaptive player columns**: the standard player list now uses 1, 2 or 3 columns depending on player count (≤5, ≤14, 15+). Statuses with `columns` set explicitly keep their setting; `/statusmod reset <id> columns` switches back to adaptive.
+
 ## 2026/10
 
 ### Changed
