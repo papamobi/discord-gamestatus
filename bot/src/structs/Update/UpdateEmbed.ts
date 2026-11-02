@@ -308,7 +308,13 @@ function renderGamedigPlayers(
     name: extractPlayerName(p),
   }));
   enriched.sort((a, b) => a.name.localeCompare(b.name));
-  const columns = update.getOption("columns") as number;
+  // Adaptive columns unless the status explicitly sets one.
+  const userColumns = update.options?.columns;
+  const count = enriched.length;
+  const columns =
+    userColumns != null
+      ? userColumns
+      : count <= 5 ? 1 : count <= 14 ? 2 : 3;
   const rows = Math.ceil(enriched.length / columns);
   const nameLimit = columns <= 1 ? 30 : columns === 2 ? 24 : 22;
   for (let i = 0; i < columns; i++) {
