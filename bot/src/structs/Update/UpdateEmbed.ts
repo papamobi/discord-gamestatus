@@ -313,7 +313,7 @@ function formatTeam(
   );
   if (layout.showDamage)
     headerParts.push(
-      "_dmg_" + FIGURE_SPACE.repeat(Math.max(0, widths.dmg - 2))
+      "_dmg_" + FIGURE_SPACE.repeat(Math.max(0, widths.dmg - 3))
     );
   headerParts.push("_player_");
   const header = "-# " + headerParts.join("\u2007·\u2007");
