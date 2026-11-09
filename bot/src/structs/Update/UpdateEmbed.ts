@@ -243,7 +243,7 @@ function renderTr1ckhouseRoster(
   if (roster.teams.spectator.length > 0) {
     const names = roster.teams.spectator
       .map((p) => markdownEscape(stripGameColors(p.name)))
-      .join(", ");
+      .join("\u2002·\u2002");
     embed.addField(
       `${EMOJI_SPEC} Spectators (${roster.teams.spectator.length})`,
       names,
@@ -275,8 +275,8 @@ function computeColumnWidths(
 const charWidth = (c: string): number =>
   "iljI.,:;'!|".includes(c) ? 0.45
   : "frt()[] ".includes(c) ? 0.65
-  : "mwMW@%".includes(c) ? 1.45
-  : c >= "A" && c <= "Z" ? 1.15
+  : "mwMW@%".includes(c) ? 1.5
+  : c >= "A" && c <= "Z" ? 1.25
   : 1;
 
 function fitName(name: string, budget: number): string {
@@ -300,7 +300,7 @@ function formatTeam(
 ): string {
   if (players.length === 0) return "_empty_";
   // k/d and dmg share one chip; no-damage layouts keep a single short chip.
-  const chipChars = widths.primary + (layout.showDamage ? widths.dmg : -1.25);
+  const chipChars = widths.primary + (layout.showDamage ? widths.dmg : 0);
   const nameBudget = Math.min(
     24,
     columnUnits + 6 - 1.6 * chipChars + (layout.showDamage ? 1 : 0)
