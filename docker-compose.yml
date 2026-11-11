@@ -36,6 +36,7 @@ services:
       GS_SCHEDULER_ADDR: "scheduler:1337"
       GS_QUERY_TIMEOUT: "${GS_QUERY_TIMEOUT}"
       CONNECT_REDIRECT_URL: "${CONNECT_REDIRECT_URL:-}"
+      CONNECT_BUTTON_EMOJI: "${CONNECT_BUTTON_EMOJI:-}"
     env_file: .env
     restart: unless-stopped
     command: [ "--debug", "--verbose" ]
