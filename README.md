@@ -26,10 +26,14 @@ current status.
 
 1. Install the [tr1ckhouse_roster plugin](https://github.com/papamobi/tr1ckhouse-minqlx-plugins/tree/main/tr1ckhouse_roster) on your QL server.
 2. Add two cvars to `server.cfg`:
-set qlx_tr1ckhouseUrl "https://tr1ckhouse.net/roster"
-set qlx_tr1ckhouseKey "<API_Key>"
+
+   ```
+   set qlx_tr1ckhouseUrl "https://tr1ckhouse.net/roster"
+   set qlx_tr1ckhouseKey "<API_Key>"
+   ```
+
 3. Request the API key — DM `f.mobile` on Discord, or join the [GameStatus Support Discord](https://discord.gg/VMySf6wtaS).
-4. `!load tr1ckhouse_roster` — your server's data now shows in GameStatus embeds (K/D, damage, team scores, spectators).
+4. `!load tr1ckhouse_roster` — your server's data now shows in GameStatus embeds (K/D, damage, team scores, spectators, player country flags). Flags are optional: `set qlx_tr1ckhouseCountry "0"` turns them off.
 
 **Or self-host your own bot instance:**
 
@@ -71,7 +75,10 @@ differs from upstream in the following ways:
 ### Tr1ckHouse roster integration
 
 The `tr1ckhouse` branch adds enriched embed rendering (per-team scores,
-K/D, damage, captures) using a central roster registry at `tr1ckhouse.net`.
+K/D, damage, per-player country flags, map thumbnails) using a central
+roster registry at `tr1ckhouse.net`. Player IPs never reach the registry
+or the bot: the plugin looks them up on ip-api.com, and only the
+two-letter country code is published.
 
 Three ways to use it:
 
@@ -114,7 +121,8 @@ Three ways to use it:
 
 The `tr1ckhouse` branch adds a few more env vars for QL-specific features
 (`TR1CKHOUSE_ROSTER_API_URL`, `TR1CKHOUSE_ROSTER_API_KEY`,
-`TR1CKHOUSE_EMOJI_RED`, `TR1CKHOUSE_EMOJI_BLUE`, `TR1CKHOUSE_EMOJI_SPEC`) — see `.env.example`.
+`TR1CKHOUSE_EMOJI_RED`, `TR1CKHOUSE_EMOJI_BLUE`, `TR1CKHOUSE_EMOJI_SPEC`,
+`TR1CKHOUSE_EMOJI_NOFLAG`, `TR1CKHOUSE_MAPSHOT_URL`) — see `.env.example`.
 
 Upstream `master` is at https://github.com/discord-gamestatus/discord-gamestatus.
 

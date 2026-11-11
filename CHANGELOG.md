@@ -4,7 +4,14 @@
 
 ### Added
 
+- Country flag next to each player in enriched Quake Live rosters, resolved by the `tr1ckhouse_roster` plugin (IP → country code via ip-api.com; only the two-letter code is published, IPs never leave the game server). Unknown players (bots, LAN) show `TR1CKHOUSE_EMOJI_NOFLAG`.
+- Enriched roster layout: k/d and damage in one chip, damage of 10k or more shown without a decimal, names truncated by estimated width so rows don't wrap, and header labels that follow the column widths.
+
 - "Connect" link button on statuses for Steam-connectable games (GoldSrc/Source titles and Quake Live). Opens `CONNECT_REDIRECT_URL`, which launches Steam's connect dialog. Hidden while the server is offline. Icon is configurable with `CONNECT_BUTTON_EMOJI` (default 🎮).
+
+### Fixed
+
+- Race rosters sorted fastest first; players without a time are listed last.
 
 ### Changed
 
