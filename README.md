@@ -66,6 +66,7 @@ differs from upstream in the following ways:
   EOL April 2025) and `rust:1-alpine` for the scheduler
 - **Auto-cleanup of dead statuses**: any status offline continuously for 30 days is removed automatically (with a notification message posted in the channel first).
 - **Ephemeral info button**: attach an optional grey button under any status with configurable content shown ephemerally on click.
+- **Steam "Connect" button**: link button under statuses of Steam-connectable games (GoldSrc/Source titles and Quake Live) that opens `CONNECT_REDIRECT_URL` and launches Steam's connect dialog. Hidden while the server is offline.
 
 ### Tr1ckHouse roster integration
 
@@ -95,14 +96,21 @@ Three ways to use it:
   been effectively dead. The bot appends `?ip=<ip>&port=<port>` to this
   URL and renders `{connect}` as a clickable `[ip:port](url)` link. The
   page at the URL is expected to handle the query params however it
-  likes — typically by emitting a `steam://connect/...` launch. If unset,
-  falls back to plain `ip:port` text.
+  likes — typically by emitting a `steam://connect/...` launch. Setting it
+  also adds the "Connect" button to those statuses. If unset, falls back to
+  plain `ip:port` text and no button.
 
-  We use a lightly-branded copy of [GModJoiner](https://github.com/SetCr4/GModJoiner)
-  by [SetCr4](https://github.com/SetCr4) at [tr1ckhouse.net/steam](https://tr1ckhouse.net/steam/),
-  which already accepts the expected params and works for any Steam server. To
-  self-host, clone the GModJoiner repo, drop it under your web root, and point
-  `CONNECT_REDIRECT_URL` at your instance.
+  The public bot uses a small redirect page at
+  [tr1ckhouse.net/steam](https://tr1ckhouse.net/steam/). Self-hosters can use
+  anything that turns `?ip=<ip>&port=<port>` into a `steam://connect/ip:port`
+  redirect, for example [GModJoiner](https://github.com/SetCr4/GModJoiner) by
+  [SetCr4](https://github.com/SetCr4): drop it under your web root and point
+  `CONNECT_REDIRECT_URL` at it.
+
+- `CONNECT_BUTTON_EMOJI` — optional emoji on the "Connect" button. Unicode
+  or a custom emoji like `<:steam:123456789012345678>`; use an application
+  emoji (Developer Portal → your app → Emojis) so it renders in every guild.
+  Default: 🎮.
 
 The `tr1ckhouse` branch adds a few more env vars for QL-specific features
 (`TR1CKHOUSE_ROSTER_API_URL`, `TR1CKHOUSE_ROSTER_API_KEY`,

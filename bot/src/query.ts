@@ -124,7 +124,7 @@ export function shouldBlock(address: Address): boolean {
  * port. Other Steam games (Arma 3, Rust, ...) fail with "app id specified by
  * server is invalid", so they get a plain IP instead.
  */
-const STEAM_CONNECT_GAMES = new Set([
+export const STEAM_CONNECT_GAMES = new Set([
   // GoldSrc
   "cs16", "cscz", "hldm", "hlopfor", "tfc", "dod", "dmc", "ricochet",
   "svencoop", "gunmanchronicles",

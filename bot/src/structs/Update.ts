@@ -39,8 +39,10 @@ import {
 } from "./Update/UpdateOptions";
 import { generateEmbed } from "./Update/UpdateEmbed";
 import stateChanges, { Changes, PlayerChange } from "../stateChanges";
-import { query, State } from "../query";
+import { query, State, STEAM_CONNECT_GAMES } from "../query";
 import { assign } from "../utils";
+
+const CONNECT_EMOJI = process.env.CONNECT_BUTTON_EMOJI || "🎮";
 
 export interface UpdateConstructorOptions {
   guild?: Snowflake;
@@ -426,17 +428,39 @@ export default class Update extends Serializable {
       content: "_ _",
       embeds: [embed],
     };
-    // Add button if configured
+    // Buttons: optional info button, then the Steam connect link (if a
+    // redirect is configured and the game supports steam://connect).
+    const buttons: MessageButton[] = [];
     const buttonLabel = this.getOption("buttonLabel");
     if (buttonLabel && typeof buttonLabel === "string" && buttonLabel.trim().length > 0) {
-      const row = new MessageActionRow().addComponents(
+      buttons.push(
         new MessageButton()
           .setCustomId(`status-info:${this.guild}:${this.channel}:${this.ip}`)
           .setLabel(buttonLabel)
           .setStyle("SECONDARY")
       );
-      messageData.components = [row];
     }
+    const redirectUrl = process.env.CONNECT_REDIRECT_URL;
+    if (redirectUrl && !state.offline && STEAM_CONNECT_GAMES.has(this.type)) {
+      const sep = this.ip.lastIndexOf(":");
+      const host = sep > 0 ? this.ip.slice(0, sep) : this.ip;
+      const port = sep > 0 ? this.ip.slice(sep + 1) : "";
+      const url =
+        `${redirectUrl}?ip=${encodeURIComponent(host)}` +
+        (port ? `&port=${encodeURIComponent(port)}` : "");
+      buttons.push(
+        new MessageButton()
+          .setStyle("LINK")
+          .setLabel("Connect")
+          .setEmoji(CONNECT_EMOJI)
+          .setURL(url)
+      );
+    }
+    // Always set components so a removed button (e.g. server went offline)
+    // disappears on the next edit.
+    messageData.components = buttons.length
+      ? [new MessageActionRow().addComponents(buttons)]
+      : [];
     if (changesToSend.length > 0) {
       const changeString = changesToSend
         .map((v) => v.msg)

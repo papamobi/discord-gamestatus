@@ -2,6 +2,10 @@
 
 ## 2026/11
 
+### Added
+
+- "Connect" link button on statuses for Steam-connectable games (GoldSrc/Source titles and Quake Live). Opens `CONNECT_REDIRECT_URL`, which launches Steam's connect dialog. Hidden while the server is offline. Icon is configurable with `CONNECT_BUTTON_EMOJI` (default 🎮).
+
 ### Changed
 
 - **Adaptive player columns**: the standard player list now uses 1, 2 or 3 columns depending on player count (≤5, ≤14, 15+). Statuses with `columns` set explicitly keep their setting; `/statusmod reset <id> columns` switches back to adaptive.
