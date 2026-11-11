@@ -45,6 +45,7 @@ const FIGURE_SPACE = "\u2007";
 const EMOJI_RED = process.env.TR1CKHOUSE_EMOJI_RED || "🟥";
 const EMOJI_BLUE = process.env.TR1CKHOUSE_EMOJI_BLUE || "🟦";
 const EMOJI_SPEC = process.env.TR1CKHOUSE_EMOJI_SPEC || "⬜";
+const EMOJI_NOFLAG = process.env.TR1CKHOUSE_EMOJI_NOFLAG || "<:noflag:1567372648508432564>";
 const MAPSHOT_URL = process.env.TR1CKHOUSE_MAPSHOT_URL || "";
 const MAPSHOT_GAMES = new Set(["quakelive", "quake3"]);
 function extractPlayerName(p: Player): string {
@@ -135,11 +136,12 @@ interface LayoutConfig {
   primary: PrimaryMode;
   showDamage: boolean;
   sortBy: SortKey;
+  sortAsc?: boolean; // race: lowest time first
 }
 const GAMETYPE_LAYOUTS: Record<string, LayoutConfig> = {
   "0":  { primary: "kd",    showDamage: true,  sortBy: "kills" },
   "1":  { primary: "kd",    showDamage: true,  sortBy: "kills" },
-  "2":  { primary: "score", showDamage: false, sortBy: "score" },
+  "2":  { primary: "score", showDamage: false, sortBy: "score", sortAsc: true },
   "3":  { primary: "kd",    showDamage: true,  sortBy: "kills" },
   "4":  { primary: "kd",    showDamage: true,  sortBy: "kills" },
   "5":  { primary: "kd",    showDamage: true,  sortBy: "kills" },
@@ -171,7 +173,8 @@ const GAMETYPE_NAMES: Record<string, string> = {
   "11": "Attack & Defend",
   "12": "Red Rover",
 };
-const formatDamage = (dmg: number) => `${(dmg / 1000).toFixed(1)}k`;
+const formatDamage = (dmg: number) =>
+  dmg >= 9950 ? `${Math.round(dmg / 1000)}k` : `${(dmg / 1000).toFixed(1)}k`;
 const formatKd = (p: Tr1ckhousePlayer) => `${p.kills}/${p.deaths}`;
 const formatScore = (p: Tr1ckhousePlayer): string => {
   // Race mode: score is milliseconds; INT32_MAX = no valid time yet
@@ -198,6 +201,12 @@ function sortPlayers(
   players: Tr1ckhousePlayer[],
   layout: LayoutConfig
 ): Tr1ckhousePlayer[] {
+  if (layout.sortAsc) {
+    // Race: fastest first; no time yet (0, negative, INT32_MAX) goes last.
+    const t = (p: Tr1ckhousePlayer) =>
+      p.score > 0 && p.score < 2147483647 ? p.score : 2147483647;
+    return [...players].sort((a, b) => t(a) - t(b));
+  }
   return [...players].sort((a, b) => b[layout.sortBy] - a[layout.sortBy]);
 }
 function renderTr1ckhouseRoster(
@@ -214,12 +223,12 @@ function renderTr1ckhouseRoster(
     const widths = computeColumnWidths([...red, ...blue], layout);
     embed.addField(
       `${EMOJI_RED} RED — ${roster.score_red}`,
-      formatTeam(red, layout, widths),
+      formatTeam(red, layout, widths, 20),
       true
     );
     embed.addField(
       `${EMOJI_BLUE} BLUE — ${roster.score_blue}`,
-      formatTeam(blue, layout, widths),
+      formatTeam(blue, layout, widths, 20),
       true
     );
   } else {
@@ -227,14 +236,14 @@ function renderTr1ckhouseRoster(
     const widths = computeColumnWidths(players, layout);
     embed.addField(
       `👥 Players (${players.length})`,
-      formatTeam(players, layout, widths),
+      formatTeam(players, layout, widths, 42),
       false
     );
   }
   if (roster.teams.spectator.length > 0) {
     const names = roster.teams.spectator
       .map((p) => markdownEscape(stripGameColors(p.name)))
-      .join(", ");
+      .join("\u2002·\u2002");
     embed.addField(
       `${EMOJI_SPEC} Spectators (${roster.teams.spectator.length})`,
       names,
@@ -262,34 +271,72 @@ function computeColumnWidths(
     dmg: Math.max(1, ...dmgLens),
   };
 }
+// Rough gg sans glyph widths, in "average character" units.
+const charWidth = (c: string): number =>
+  "iljI.,:;'!|".includes(c) ? 0.45
+  : "frt()[] ".includes(c) ? 0.65
+  : "mwMW@%".includes(c) ? 1.5
+  : c >= "A" && c <= "Z" ? 1.25
+  : 1;
+
+function fitName(name: string, budget: number): string {
+  let w = 0;
+  for (const c of name) w += charWidth(c);
+  if (w <= budget) return name;
+  let out = "";
+  w = 1; // room for the ellipsis
+  for (const c of name) {
+    if (w + charWidth(c) > budget) break;
+    out += c;
+    w += charWidth(c);
+  }
+  return out + "…";
+}
 function formatTeam(
   players: Tr1ckhousePlayer[],
   layout: LayoutConfig,
-  widths: ColumnWidths
+  widths: ColumnWidths,
+  columnUnits: number
 ): string {
   if (players.length === 0) return "_empty_";
-  const nameLimit = 16;
+  // k/d and dmg share one chip; no-damage layouts keep a single short chip.
+  const chipChars = widths.primary + (layout.showDamage ? widths.dmg : 0);
+  const nameBudget = Math.min(
+    24,
+    columnUnits + 6 - 1.6 * chipChars + (layout.showDamage ? 1 : 0)
+  );
   const headerParts: string[] = [];
-  headerParts.push(layout.primary === "kd" ? "_k/d_" : "_time_");
-  if (layout.showDamage) headerParts.push("_dmg_");
+  const extra = Math.max(0, widths.primary - 4);
+    headerParts.push(
+    (layout.primary === "kd" ? "_k/d_" : "_time_") +
+      FIGURE_SPACE.repeat(extra + (layout.showDamage ? 0 : 2))
+  );
+  if (layout.showDamage)
+    headerParts.push(
+      "_dmg_" + FIGURE_SPACE.repeat(Math.max(0, widths.dmg - 3))
+    );
   headerParts.push("_player_");
-  const header = "-# " + headerParts.join("\u2007\u2007·\u2007\u2007");
+  const header = "-# " + headerParts.join("\u2007·\u2007");
   const rows = players
     .map((p) => {
       const name = stripGameColors(p.name);
-      const trimmed =
-        name.length > nameLimit ? name.slice(0, nameLimit - 1) + "…" : name;
+      const trimmed = fitName(name, nameBudget);
       const parts: string[] = [];
       const primary =
         layout.primary === "kd" ? formatKd(p) : formatScore(p);
-      parts.push(`\`${primary.padStart(widths.primary, FIGURE_SPACE)}\``);
+      const primaryCell = primary.padStart(widths.primary, FIGURE_SPACE);
       if (layout.showDamage) {
-        parts.push(
-          `\`${formatDamage(p.damage).padStart(widths.dmg, FIGURE_SPACE)}\``
-        );
+        const dmgCell = formatDamage(p.damage).padStart(widths.dmg, FIGURE_SPACE);
+        parts.push(`\`${primaryCell} ${dmgCell}\``);
+      } else {
+        parts.push(`\`${primaryCell}\``);
       }
-      parts.push(markdownEscape(trimmed));
-      return parts.join("\u2007\u2007");
+      const flag = p.country ? codeToFlag(p.country) : EMOJI_NOFLAG;
+      parts.push(
+        (flag ? flag + "\u00A0" : "") +
+          markdownEscape(trimmed).replace(/ /g, "\u00A0")
+      );
+      return parts.join("\u2009");
     })
     .join("\n");
   return `${header}\n${rows}`;

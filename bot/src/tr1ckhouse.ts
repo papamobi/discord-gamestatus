@@ -15,6 +15,7 @@ export interface Tr1ckhousePlayer {
   deaths: number;
   damage: number;
   ping: number;
+  country?: string;
 }
 
 export interface Tr1ckhouseRoster {
