@@ -306,10 +306,13 @@ function formatTeam(
     columnUnits + 6 - 1.6 * chipChars + (layout.showDamage ? 1 : 0)
   );
   const headerParts: string[] = [];
-  const extra = Math.max(0, widths.primary - 4);
-    headerParts.push(
-    (layout.primary === "kd" ? "_k/d_" : "_time_") +
-      FIGURE_SPACE.repeat(extra + (layout.showDamage ? 0 : 2))
+  // Pad the first label to follow its chip width. No-damage layouts can
+  // shrink to zero padding (e.g. race with no times yet: a 1-char "—" chip).
+  const extra = layout.showDamage
+    ? Math.max(0, widths.primary - 4)
+    : Math.max(0, widths.primary - 2);
+  headerParts.push(
+    (layout.primary === "kd" ? "_k/d_" : "_time_") + FIGURE_SPACE.repeat(extra)
   );
   if (layout.showDamage)
     headerParts.push(
