@@ -284,7 +284,7 @@ function fitName(name: string, budget: number): string {
   for (const c of name) w += charWidth(c);
   if (w <= budget) return name;
   let out = "";
-  w = 1; // room for the ellipsis
+  w = 1.8; // room for the ellipsis (wider than a letter)
   for (const c of name) {
     if (w + charWidth(c) > budget) break;
     out += c;
