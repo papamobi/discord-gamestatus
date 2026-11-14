@@ -156,7 +156,7 @@ const parseMap = function (map: string, protocol: string) {
     case "minecraft":
       return "Minecraft world";
     default:
-      return map;
+      return map && map.trim() ? map : "unknown map";
   }
 };
 
