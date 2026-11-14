@@ -176,10 +176,11 @@ const GAMETYPE_NAMES: Record<string, string> = {
 const formatDamage = (dmg: number) =>
   dmg >= 9950 ? `${Math.round(dmg / 1000)}k` : `${(dmg / 1000).toFixed(1)}k`;
 const formatKd = (p: Tr1ckhousePlayer) => `${p.kills}/${p.deaths}`;
+// Same width as a real time so the column and header stay aligned.
+const NO_TIME = "-:--.---";
 const formatScore = (p: Tr1ckhousePlayer): string => {
-  // Race mode: score is milliseconds; INT32_MAX = no valid time yet
-  if (p.score >= 2147483647 || p.score < 0) return "—";
-  if (p.score === 0) return "—";
+  // Race mode: score is milliseconds; 0, negative or INT32_MAX = no time yet
+  if (p.score >= 2147483647 || p.score <= 0) return NO_TIME;
   // Format as m:ss.mmm (race time)
   const min = Math.floor(p.score / 60000);
   const sec = Math.floor((p.score % 60000) / 1000);
