@@ -35,12 +35,18 @@ function serverFormat(str: string, server: State, flag: string = "", qlstats: st
   str = str.replace(/\{qlstats\}/gi, qlstats);
   return str;
 }
+// Quake 3 / OpenArena colour codes: ^ + any character except another ^
+// ("^^" draws a literal ^), plus ^Xrrggbb hex colours.
 const stripGameColors = (s: string) =>
   s
-    .replace(/\^(X.{6}|.)/g, "")
+    .replace(/\^(X.{6}|[^^])/g, "")
     .replace(/\$([0-9a-f]{3}|[a-z])/gi, "")
     .replace(/0x[0-9a-f]{6}/g, "")
     .replace(/\x1b...|[\x00-\x1a]/g, "");
+// Quake Live colour codes are only ^0-^7; anything else is literal text.
+// Roster names already come cleaned by minqlx (clean_name).
+const stripQlColors = (s: string) =>
+  s.replace(/\^[0-7]/g, "").replace(/[\x00-\x1f]/g, "");
 const FIGURE_SPACE = "\u2007";
 const EMOJI_RED = process.env.TR1CKHOUSE_EMOJI_RED || "🟥";
 const EMOJI_BLUE = process.env.TR1CKHOUSE_EMOJI_BLUE || "🟦";
@@ -243,7 +249,7 @@ function renderTr1ckhouseRoster(
   }
   if (roster.teams.spectator.length > 0) {
     const names = roster.teams.spectator
-      .map((p) => markdownEscape(stripGameColors(p.name)))
+      .map((p) => markdownEscape(stripQlColors(p.name)))
       .join("\u2002·\u2002");
     embed.addField(
       `${EMOJI_SPEC} Spectators (${roster.teams.spectator.length})`,
@@ -323,7 +329,7 @@ function formatTeam(
   const header = "-# " + headerParts.join("\u2007·\u2007");
   const rows = players
     .map((p) => {
-      const name = stripGameColors(p.name);
+      const name = stripQlColors(p.name);
       const trimmed = fitName(name, nameBudget);
       const parts: string[] = [];
       const primary =
