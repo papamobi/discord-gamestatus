@@ -34,8 +34,9 @@ function serverFormat(str: string, server: State, flag: string = "", qlstats: st
 const stripGameColors = (s: string) =>
   s
     // Quake 3 / Quake Live / Doom 3 / Savage 2
-    // ^X + 6-hex (long form) or ^ + single char (short form)
-    .replace(/\^(X.{6}|.)/g, "")
+    // ^X + 6-hex (long form) or ^ + single char (short form);
+    // "^^" is a literal ^, not a colour code
+    .replace(/\^(X.{6}|[^^])/g, "")
     // Nadeo / Trackmania — $ + 3-hex or single letter
     .replace(/\$([0-9a-f]{3}|[a-z])/gi, "")
     // Armagetron — 0xRRGGBB
